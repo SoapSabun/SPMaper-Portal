@@ -1,0 +1,235 @@
+.navigation {
+  padding: 2rem 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: var(--brand-primary);
+}
+
+.signOutBtn {
+  color: var(--brand-heading);
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.signOutBtn:hover {
+  color: var(--brand-primary-hover);
+}
+
+.header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: var(--text-secondary);
+}
+
+.formSection {
+  max-width: 600px;
+  margin: 0 auto 6rem;
+}
+
+.adminForm {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--brand-gold);
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15);
+}
+
+.fileInput {
+  padding: 0.5rem 0;
+}
+
+.submitBtn {
+  margin-top: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--brand-primary);
+  color: var(--bg-primary);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 1px solid var(--brand-gold);
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background-color: var(--brand-primary-hover);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: var(--text-tertiary);
+}
+
+.message {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+.messageSuccess {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid #34d399;
+}
+
+.messageError {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid #f87171;
+}
+
+.listSection {
+  max-width: 800px;
+  margin: 0 auto 6rem;
+}
+
+.paperListContainer h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.tableWrapper {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  background: var(--bg-tertiary);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.table td {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.deleteBtn {
+  padding: 0.5rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid #f87171;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover:not(:disabled) {
+  background: #dc2626;
+  color: white;
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.pageBtn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--brand-primary);
+  border: 1px solid var(--brand-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: var(--brand-primary);
+  color: var(--bg-primary);
+}
+
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: var(--text-tertiary);
+  color: var(--text-tertiary);
+}
+
+.pageInfo {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
