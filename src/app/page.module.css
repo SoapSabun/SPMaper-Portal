@@ -59,7 +59,7 @@
 
 .input:focus {
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(11, 74, 74, 0.15);
 }
 
 .grid {

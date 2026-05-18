@@ -1,36 +1,37 @@
 :root {
-  /* Background system - Parchment */
-  --bg-primary: #FFF1D3; 
-  --bg-secondary: #FDE8BB;
-  --bg-tertiary: #F5E4C3;
+  /* Background system - Aviothic Cream & Ivory */
+  --bg-primary: #F5EAD7; 
+  --bg-secondary: #FFF9F0;
+  --bg-tertiary: #EAE0CD;
   
-  /* Typography - Ink & Sepia */
-  --text-primary: #1E1209;
-  --text-secondary: #4A3728;
-  --text-tertiary: #8f7966;
+  /* Typography - Clean & Structured */
+  --text-primary: #2B2B2B;
+  --text-secondary: #4A4A4A;
+  --text-tertiary: #737373;
   
-  /* Maroon hierarchy */
-  --brand-primary: #6B1C2A; 
-  --brand-primary-hover: #B85C6E;
-  --brand-heading: #8C2A3A;
-  --brand-blush: #F2D5DA;
+  /* Aviothic Teal hierarchy */
+  --brand-primary: #0B4A4A; 
+  --brand-primary-hover: #136666;
+  --brand-heading: #0B4A4A;
+  --brand-blush: #E1EBEB; /* Very soft teal for badges */
   
-  /* Gold accent */
-  --brand-gold: #B8860B;
-  --brand-gold-light: #D4A422;
+  /* Aviothic Gold accent */
+  --brand-gold: #B8872C;
+  --brand-gold-light: #CFA043;
   
-  /* Borders - Dust */
-  --border-color: #C9B99A;
+  /* Borders - Structured */
+  --border-color: #D9CDBC;
   
-  --radius-sm: 0.375rem;
+  /* Sleek modern radius */
+  --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   
-  /* Warm shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(74, 55, 40, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(74, 55, 40, 0.1), 0 2px 4px -2px rgba(74, 55, 40, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(74, 55, 40, 0.1), 0 4px 6px -4px rgba(74, 55, 40, 0.1);
+  /* Elegant structured shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(11, 74, 74, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(11, 74, 74, 0.08), 0 2px 4px -2px rgba(11, 74, 74, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(11, 74, 74, 0.1), 0 4px 6px -4px rgba(11, 74, 74, 0.05);
 }
 
 /* Note: Removed dark mode because the parchment aesthetic relies on light colors */
@@ -50,10 +51,30 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--text-primary);
-  background: var(--bg-primary);
+  background: radial-gradient(circle at top right, var(--bg-secondary) 0%, var(--bg-primary) 60%, var(--bg-tertiary) 100%);
+  background-attachment: fixed;
   font-family: var(--font-inter), serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200vw;
+  height: 200vh;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.03;
+  background: repeating-linear-gradient(
+    60deg,
+    var(--brand-primary),
+    var(--brand-primary) 1px,
+    transparent 1px,
+    transparent 100px
+  );
 }
 
 * {
