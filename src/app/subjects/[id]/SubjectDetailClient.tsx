@@ -162,13 +162,41 @@ export default function SubjectDetailClient({
 
     const lowerType = (paper.paper_type || '').toLowerCase();
     const lowerTitle = (paper.title || '').toLowerCase();
-    const isSkema = lowerType.includes('skema') || lowerTitle.includes('skema') || lowerTitle.includes('jawapan');
+
+    // Check if paper contains BOTH questions and scheme (e.g. "Soalan & Skema", "K1+Skema", "Soalan + Jawapan")
+    const isBoth = 
+      lowerType.includes('&') || 
+      lowerType.includes('dan') ||
+      lowerTitle.includes('soalan &') || 
+      lowerTitle.includes('soalan +') || 
+      lowerTitle.includes('+ skema') || 
+      lowerTitle.includes('+skema') || 
+      lowerTitle.includes('+ jawapan') || 
+      lowerTitle.includes('+jawapan') || 
+      lowerTitle.includes('& skema') ||
+      lowerTitle.includes('& jawapan') ||
+      (lowerTitle.includes('soalan') && (lowerTitle.includes('skema') || lowerTitle.includes('jawapan')));
+
+    const isSkema = !isBoth && (lowerType.includes('skema') || lowerTitle.includes('skema') || lowerTitle.includes('jawapan'));
 
     const isK1 = lowerType.includes('kertas 1') || lowerType.includes('k1') || lowerTitle.includes('k1') || lowerTitle.includes('kertas 1');
     const isK2 = lowerType.includes('kertas 2') || lowerType.includes('k2') || lowerTitle.includes('k2') || lowerTitle.includes('kertas 2');
     const isK3 = lowerType.includes('kertas 3') || lowerType.includes('k3') || lowerTitle.includes('k3') || lowerTitle.includes('kertas 3');
 
-    if (isK1) {
+    if (isBoth) {
+      if (isK1) {
+        if (!pack.k1.soalan) pack.k1.soalan = paper;
+        if (!pack.k1.skema) pack.k1.skema = paper;
+      } else if (isK2) {
+        if (!pack.k2.soalan) pack.k2.soalan = paper;
+        if (!pack.k2.skema) pack.k2.skema = paper;
+      } else if (isK3) {
+        if (!pack.k3.soalan) pack.k3.soalan = paper;
+        if (!pack.k3.skema) pack.k3.skema = paper;
+      } else {
+        pack.others.push(paper);
+      }
+    } else if (isK1) {
       if (isSkema) pack.k1.skema = paper;
       else pack.k1.soalan = paper;
     } else if (isK2) {
@@ -418,34 +446,24 @@ export default function SubjectDetailClient({
                         <span className={styles.slotSubtitle}>Soalan Objektif</span>
                       </div>
                       <div className={styles.slotActions}>
-                        {pack.k1.soalan && (
+                        {pack.k1.soalan && pack.k1.skema && pack.k1.soalan.id === pack.k1.skema.id ? (
                           <div className={styles.btnGroup}>
                             <a
                               href={pack.k1.soalan.publicUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={`${styles.btnAction} ${styles.btnSoalan} ${openingId === pack.k1.soalan.id ? styles.btnLoading : ''}`}
+                              className={`${styles.btnAction} ${styles.btnBoth} ${openingId === pack.k1.soalan.id ? styles.btnLoading : ''}`}
                               onClick={() => handleOpenPaper(pack.k1.soalan!.id)}
-                              title="Buka & Baca Kertas Soalan 1"
+                              title="Buka & Baca Kertas Soalan & Skema (Lengkap)"
                             >
-                              {openingId === pack.k1.soalan.id ? (
-                                <>
-                                  <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                    <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                    <path d="M12 2a10 10 0 0 1 10 10" />
-                                  </svg>
-                                  Membuka...
-                                </>
-                              ) : (
-                                <>👁️ Soalan</>
-                              )}
+                              {openingId === pack.k1.soalan.id ? 'Membuka...' : '📑 Soalan & Skema'}
                             </a>
                             <a
                               href={getDownloadHref(pack.k1.soalan.publicUrl, pack.k1.soalan.title)}
                               className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k1.soalan.id ? styles.btnDownloading : ''}`}
                               onClick={() => handleDownloadPaper(pack.k1.soalan!.id, pack.k1.soalan!.title)}
-                              title="Muat Turun Soalan 1 ke Peranti"
-                              aria-label="Muat turun Kertas Soalan 1"
+                              title="Muat Turun Soalan & Skema ke Peranti"
+                              aria-label="Muat turun Kertas Soalan & Skema 1"
                               download
                             >
                               {downloadingId === pack.k1.soalan.id ? (
@@ -458,47 +476,71 @@ export default function SubjectDetailClient({
                               )}
                             </a>
                           </div>
-                        )}
-                        {pack.k1.skema && (
-                          <div className={styles.btnGroup}>
-                            <a
-                              href={pack.k1.skema.publicUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`${styles.btnAction} ${styles.btnSkema} ${openingId === pack.k1.skema.id ? styles.btnLoading : ''}`}
-                              onClick={() => handleOpenPaper(pack.k1.skema!.id)}
-                              title="Buka & Baca Skema Jawapan 1"
-                            >
-                              {openingId === pack.k1.skema.id ? (
-                                <>
-                                  <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                    <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                    <path d="M12 2a10 10 0 0 1 10 10" />
-                                  </svg>
-                                  Membuka...
-                                </>
-                              ) : (
-                                <>📋 Skema</>
-                              )}
-                            </a>
-                            <a
-                              href={getDownloadHref(pack.k1.skema.publicUrl, pack.k1.skema.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k1.skema.id ? styles.btnDownloading : ''}`}
-                              onClick={() => handleDownloadPaper(pack.k1.skema!.id, pack.k1.skema!.title)}
-                              title="Muat Turun Skema 1 ke Peranti"
-                              aria-label="Muat turun Skema Jawapan 1"
-                              download
-                            >
-                              {downloadingId === pack.k1.skema.id ? (
-                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                  <path d="M12 2a10 10 0 0 1 10 10" />
-                                </svg>
-                              ) : (
-                                '📥'
-                              )}
-                            </a>
-                          </div>
+                        ) : (
+                          <>
+                            {pack.k1.soalan && (
+                              <div className={styles.btnGroup}>
+                                <a
+                                  href={pack.k1.soalan.publicUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${styles.btnAction} ${styles.btnSoalan} ${openingId === pack.k1.soalan.id ? styles.btnLoading : ''}`}
+                                  onClick={() => handleOpenPaper(pack.k1.soalan!.id)}
+                                  title="Buka & Baca Kertas Soalan 1"
+                                >
+                                  {openingId === pack.k1.soalan.id ? 'Membuka...' : '👁️ Soalan'}
+                                </a>
+                                <a
+                                  href={getDownloadHref(pack.k1.soalan.publicUrl, pack.k1.soalan.title)}
+                                  className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k1.soalan.id ? styles.btnDownloading : ''}`}
+                                  onClick={() => handleDownloadPaper(pack.k1.soalan!.id, pack.k1.soalan!.title)}
+                                  title="Muat Turun Soalan 1 ke Peranti"
+                                  aria-label="Muat turun Kertas Soalan 1"
+                                  download
+                                >
+                                  {downloadingId === pack.k1.soalan.id ? (
+                                    <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                      <path d="M12 2a10 10 0 0 1 10 10" />
+                                    </svg>
+                                  ) : (
+                                    '📥'
+                                  )}
+                                </a>
+                              </div>
+                            )}
+                            {pack.k1.skema && (
+                              <div className={styles.btnGroup}>
+                                <a
+                                  href={pack.k1.skema.publicUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${styles.btnAction} ${styles.btnSkema} ${openingId === pack.k1.skema.id ? styles.btnLoading : ''}`}
+                                  onClick={() => handleOpenPaper(pack.k1.skema!.id)}
+                                  title={!pack.k1.soalan ? "Skema Jawapan (Soalan tidak dimuat naik oleh penyedia)" : "Buka & Baca Skema Jawapan 1"}
+                                >
+                                  {openingId === pack.k1.skema.id ? 'Membuka...' : !pack.k1.soalan ? '📋 Skema (Sahaja)' : '📋 Skema'}
+                                </a>
+                                <a
+                                  href={getDownloadHref(pack.k1.skema.publicUrl, pack.k1.skema.title)}
+                                  className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k1.skema.id ? styles.btnDownloading : ''}`}
+                                  onClick={() => handleDownloadPaper(pack.k1.skema!.id, pack.k1.skema!.title)}
+                                  title="Muat Turun Skema 1 ke Peranti"
+                                  aria-label="Muat turun Skema Jawapan 1"
+                                  download
+                                >
+                                  {downloadingId === pack.k1.skema.id ? (
+                                    <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                      <path d="M12 2a10 10 0 0 1 10 10" />
+                                    </svg>
+                                  ) : (
+                                    '📥'
+                                  )}
+                                </a>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
@@ -512,34 +554,24 @@ export default function SubjectDetailClient({
                         <span className={styles.slotSubtitle}>Subjektif Bahagian A & B</span>
                       </div>
                       <div className={styles.slotActions}>
-                        {pack.k2.soalan && (
+                        {pack.k2.soalan && pack.k2.skema && pack.k2.soalan.id === pack.k2.skema.id ? (
                           <div className={styles.btnGroup}>
                             <a
                               href={pack.k2.soalan.publicUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={`${styles.btnAction} ${styles.btnSoalan} ${openingId === pack.k2.soalan.id ? styles.btnLoading : ''}`}
+                              className={`${styles.btnAction} ${styles.btnBoth} ${openingId === pack.k2.soalan.id ? styles.btnLoading : ''}`}
                               onClick={() => handleOpenPaper(pack.k2.soalan!.id)}
-                              title="Buka & Baca Kertas Soalan 2"
+                              title="Buka & Baca Kertas Soalan & Skema (Lengkap)"
                             >
-                              {openingId === pack.k2.soalan.id ? (
-                                <>
-                                  <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                    <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                    <path d="M12 2a10 10 0 0 1 10 10" />
-                                  </svg>
-                                  Membuka...
-                                </>
-                              ) : (
-                                <>👁️ Soalan</>
-                              )}
+                              {openingId === pack.k2.soalan.id ? 'Membuka...' : '📑 Soalan & Skema'}
                             </a>
                             <a
                               href={getDownloadHref(pack.k2.soalan.publicUrl, pack.k2.soalan.title)}
                               className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k2.soalan.id ? styles.btnDownloading : ''}`}
                               onClick={() => handleDownloadPaper(pack.k2.soalan!.id, pack.k2.soalan!.title)}
-                              title="Muat Turun Soalan 2 ke Peranti"
-                              aria-label="Muat turun Kertas Soalan 2"
+                              title="Muat Turun Soalan & Skema ke Peranti"
+                              aria-label="Muat turun Kertas Soalan & Skema 2"
                               download
                             >
                               {downloadingId === pack.k2.soalan.id ? (
@@ -552,47 +584,71 @@ export default function SubjectDetailClient({
                               )}
                             </a>
                           </div>
-                        )}
-                        {pack.k2.skema && (
-                          <div className={styles.btnGroup}>
-                            <a
-                              href={pack.k2.skema.publicUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`${styles.btnAction} ${styles.btnSkema} ${openingId === pack.k2.skema.id ? styles.btnLoading : ''}`}
-                              onClick={() => handleOpenPaper(pack.k2.skema!.id)}
-                              title="Buka & Baca Skema Jawapan 2"
-                            >
-                              {openingId === pack.k2.skema.id ? (
-                                <>
-                                  <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                    <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                    <path d="M12 2a10 10 0 0 1 10 10" />
-                                  </svg>
-                                  Membuka...
-                                </>
-                              ) : (
-                                <>📋 Skema</>
-                              )}
-                            </a>
-                            <a
-                              href={getDownloadHref(pack.k2.skema.publicUrl, pack.k2.skema.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k2.skema.id ? styles.btnDownloading : ''}`}
-                              onClick={() => handleDownloadPaper(pack.k2.skema!.id, pack.k2.skema!.title)}
-                              title="Muat Turun Skema 2 ke Peranti"
-                              aria-label="Muat turun Skema Jawapan 2"
-                              download
-                            >
-                              {downloadingId === pack.k2.skema.id ? (
-                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                  <path d="M12 2a10 10 0 0 1 10 10" />
-                                </svg>
-                              ) : (
-                                '📥'
-                              )}
-                            </a>
-                          </div>
+                        ) : (
+                          <>
+                            {pack.k2.soalan && (
+                              <div className={styles.btnGroup}>
+                                <a
+                                  href={pack.k2.soalan.publicUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${styles.btnAction} ${styles.btnSoalan} ${openingId === pack.k2.soalan.id ? styles.btnLoading : ''}`}
+                                  onClick={() => handleOpenPaper(pack.k2.soalan!.id)}
+                                  title="Buka & Baca Kertas Soalan 2"
+                                >
+                                  {openingId === pack.k2.soalan.id ? 'Membuka...' : '👁️ Soalan'}
+                                </a>
+                                <a
+                                  href={getDownloadHref(pack.k2.soalan.publicUrl, pack.k2.soalan.title)}
+                                  className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k2.soalan.id ? styles.btnDownloading : ''}`}
+                                  onClick={() => handleDownloadPaper(pack.k2.soalan!.id, pack.k2.soalan!.title)}
+                                  title="Muat Turun Soalan 2 ke Peranti"
+                                  aria-label="Muat turun Kertas Soalan 2"
+                                  download
+                                >
+                                  {downloadingId === pack.k2.soalan.id ? (
+                                    <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                      <path d="M12 2a10 10 0 0 1 10 10" />
+                                    </svg>
+                                  ) : (
+                                    '📥'
+                                  )}
+                                </a>
+                              </div>
+                            )}
+                            {pack.k2.skema && (
+                              <div className={styles.btnGroup}>
+                                <a
+                                  href={pack.k2.skema.publicUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${styles.btnAction} ${styles.btnSkema} ${openingId === pack.k2.skema.id ? styles.btnLoading : ''}`}
+                                  onClick={() => handleOpenPaper(pack.k2.skema!.id)}
+                                  title={!pack.k2.soalan ? "Skema Jawapan (Soalan tidak dimuat naik oleh penyedia)" : "Buka & Baca Skema Jawapan 2"}
+                                >
+                                  {openingId === pack.k2.skema.id ? 'Membuka...' : !pack.k2.soalan ? '📋 Skema (Sahaja)' : '📋 Skema'}
+                                </a>
+                                <a
+                                  href={getDownloadHref(pack.k2.skema.publicUrl, pack.k2.skema.title)}
+                                  className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k2.skema.id ? styles.btnDownloading : ''}`}
+                                  onClick={() => handleDownloadPaper(pack.k2.skema!.id, pack.k2.skema!.title)}
+                                  title="Muat Turun Skema 2 ke Peranti"
+                                  aria-label="Muat turun Skema Jawapan 2"
+                                  download
+                                >
+                                  {downloadingId === pack.k2.skema.id ? (
+                                    <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                      <path d="M12 2a10 10 0 0 1 10 10" />
+                                    </svg>
+                                  ) : (
+                                    '📥'
+                                  )}
+                                </a>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
@@ -606,34 +662,24 @@ export default function SubjectDetailClient({
                         <span className={styles.slotSubtitle}>Amali / Lisan</span>
                       </div>
                       <div className={styles.slotActions}>
-                        {pack.k3.soalan && (
+                        {pack.k3.soalan && pack.k3.skema && pack.k3.soalan.id === pack.k3.skema.id ? (
                           <div className={styles.btnGroup}>
                             <a
                               href={pack.k3.soalan.publicUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={`${styles.btnAction} ${styles.btnSoalan} ${openingId === pack.k3.soalan.id ? styles.btnLoading : ''}`}
+                              className={`${styles.btnAction} ${styles.btnBoth} ${openingId === pack.k3.soalan.id ? styles.btnLoading : ''}`}
                               onClick={() => handleOpenPaper(pack.k3.soalan!.id)}
-                              title="Buka & Baca Kertas Soalan 3"
+                              title="Buka & Baca Kertas Soalan & Skema (Lengkap)"
                             >
-                              {openingId === pack.k3.soalan.id ? (
-                                <>
-                                  <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                    <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                    <path d="M12 2a10 10 0 0 1 10 10" />
-                                  </svg>
-                                  Membuka...
-                                </>
-                              ) : (
-                                <>👁️ Soalan</>
-                              )}
+                              {openingId === pack.k3.soalan.id ? 'Membuka...' : '📑 Soalan & Skema'}
                             </a>
                             <a
                               href={getDownloadHref(pack.k3.soalan.publicUrl, pack.k3.soalan.title)}
                               className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k3.soalan.id ? styles.btnDownloading : ''}`}
                               onClick={() => handleDownloadPaper(pack.k3.soalan!.id, pack.k3.soalan!.title)}
-                              title="Muat Turun Soalan 3 ke Peranti"
-                              aria-label="Muat turun Kertas Soalan 3"
+                              title="Muat Turun Soalan & Skema ke Peranti"
+                              aria-label="Muat turun Kertas Soalan & Skema 3"
                               download
                             >
                               {downloadingId === pack.k3.soalan.id ? (
@@ -646,47 +692,71 @@ export default function SubjectDetailClient({
                               )}
                             </a>
                           </div>
-                        )}
-                        {pack.k3.skema && (
-                          <div className={styles.btnGroup}>
-                            <a
-                              href={pack.k3.skema.publicUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`${styles.btnAction} ${styles.btnSkema} ${openingId === pack.k3.skema.id ? styles.btnLoading : ''}`}
-                              onClick={() => handleOpenPaper(pack.k3.skema!.id)}
-                              title="Buka & Baca Skema Jawapan 3"
-                            >
-                              {openingId === pack.k3.skema.id ? (
-                                <>
-                                  <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                    <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                    <path d="M12 2a10 10 0 0 1 10 10" />
-                                  </svg>
-                                  Membuka...
-                                </>
-                              ) : (
-                                <>📋 Skema</>
-                              )}
-                            </a>
-                            <a
-                              href={getDownloadHref(pack.k3.skema.publicUrl, pack.k3.skema.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k3.skema.id ? styles.btnDownloading : ''}`}
-                              onClick={() => handleDownloadPaper(pack.k3.skema!.id, pack.k3.skema!.title)}
-                              title="Muat Turun Skema 3 ke Peranti"
-                              aria-label="Muat turun Skema Jawapan 3"
-                              download
-                            >
-                              {downloadingId === pack.k3.skema.id ? (
-                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                                  <path d="M12 2a10 10 0 0 1 10 10" />
-                                </svg>
-                              ) : (
-                                '📥'
-                              )}
-                            </a>
-                          </div>
+                        ) : (
+                          <>
+                            {pack.k3.soalan && (
+                              <div className={styles.btnGroup}>
+                                <a
+                                  href={pack.k3.soalan.publicUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${styles.btnAction} ${styles.btnSoalan} ${openingId === pack.k3.soalan.id ? styles.btnLoading : ''}`}
+                                  onClick={() => handleOpenPaper(pack.k3.soalan!.id)}
+                                  title="Buka & Baca Kertas Soalan 3"
+                                >
+                                  {openingId === pack.k3.soalan.id ? 'Membuka...' : '👁️ Soalan'}
+                                </a>
+                                <a
+                                  href={getDownloadHref(pack.k3.soalan.publicUrl, pack.k3.soalan.title)}
+                                  className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k3.soalan.id ? styles.btnDownloading : ''}`}
+                                  onClick={() => handleDownloadPaper(pack.k3.soalan!.id, pack.k3.soalan!.title)}
+                                  title="Muat Turun Soalan 3 ke Peranti"
+                                  aria-label="Muat turun Kertas Soalan 3"
+                                  download
+                                >
+                                  {downloadingId === pack.k3.soalan.id ? (
+                                    <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                      <path d="M12 2a10 10 0 0 1 10 10" />
+                                    </svg>
+                                  ) : (
+                                    '📥'
+                                  )}
+                                </a>
+                              </div>
+                            )}
+                            {pack.k3.skema && (
+                              <div className={styles.btnGroup}>
+                                <a
+                                  href={pack.k3.skema.publicUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${styles.btnAction} ${styles.btnSkema} ${openingId === pack.k3.skema.id ? styles.btnLoading : ''}`}
+                                  onClick={() => handleOpenPaper(pack.k3.skema!.id)}
+                                  title={!pack.k3.soalan ? "Skema Jawapan (Soalan tidak dimuat naik oleh penyedia)" : "Buka & Baca Skema Jawapan 3"}
+                                >
+                                  {openingId === pack.k3.skema.id ? 'Membuka...' : !pack.k3.soalan ? '📋 Skema (Sahaja)' : '📋 Skema'}
+                                </a>
+                                <a
+                                  href={getDownloadHref(pack.k3.skema.publicUrl, pack.k3.skema.title)}
+                                  className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k3.skema.id ? styles.btnDownloading : ''}`}
+                                  onClick={() => handleDownloadPaper(pack.k3.skema!.id, pack.k3.skema!.title)}
+                                  title="Muat Turun Skema 3 ke Peranti"
+                                  aria-label="Muat turun Skema Jawapan 3"
+                                  download
+                                >
+                                  {downloadingId === pack.k3.skema.id ? (
+                                    <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                      <path d="M12 2a10 10 0 0 1 10 10" />
+                                    </svg>
+                                  ) : (
+                                    '📥'
+                                  )}
+                                </a>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>

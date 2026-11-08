@@ -510,6 +510,18 @@
   background: var(--brand-blush);
 }
 
+.btnBoth {
+  background: linear-gradient(135deg, var(--brand-primary) 0%, #115e59 100%);
+  color: var(--bg-primary);
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.btnBoth:hover {
+  background: linear-gradient(135deg, var(--brand-primary-hover) 0%, #0d9488 100%);
+}
+
 .btnGeneric {
   background: var(--bg-tertiary);
   color: var(--text-primary);
@@ -869,6 +881,7 @@
 
   .btnSoalan,
   .btnSkema,
+  .btnBoth,
   .btnGeneric {
     flex: 1;
     font-size: 0.825rem;

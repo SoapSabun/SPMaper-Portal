@@ -158,10 +158,11 @@ async function deduplicateBatch(papers) {
 
   for (const p of paperDetails) {
     if (p.size) {
-      if (!bySize.has(p.size)) bySize.set(p.size, []);
-      bySize.get(p.size).push(p);
+      const sizeKey = `${p.negeri}__${p.size}`;
+      if (!bySize.has(sizeKey)) bySize.set(sizeKey, []);
+      bySize.get(sizeKey).push(p);
     }
-    const tKey = p.title.toLowerCase().trim();
+    const tKey = `${p.negeri}__${p.title.toLowerCase().trim()}`;
     if (!byTitle.has(tKey)) byTitle.set(tKey, []);
     byTitle.get(tKey).push(p);
   }
