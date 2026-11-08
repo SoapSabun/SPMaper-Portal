@@ -67,6 +67,9 @@ export default function SubjectDetailClient({
 }) {
   const [isPending, startTransition] = useTransition();
   const [openingId, setOpeningId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadToast, setDownloadToast] = useState<{ title: string; status: 'downloading' | 'started' } | null>(null);
+  const [isNavigatingHome, setIsNavigatingHome] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('All');
   const [selectedNegeri, setSelectedNegeri] = useState<string>('All');
@@ -79,6 +82,20 @@ export default function SubjectDetailClient({
     setTimeout(() => {
       setOpeningId(null);
     }, 2000);
+  };
+
+  const handleDownloadPaper = (id: string, title: string) => {
+    setDownloadingId(id);
+    setDownloadToast({ title, status: 'downloading' });
+
+    setTimeout(() => {
+      setDownloadingId(null);
+      setDownloadToast({ title, status: 'started' });
+    }, 1800);
+
+    setTimeout(() => {
+      setDownloadToast((prev) => (prev?.title === title ? null : prev));
+    }, 4500);
   };
 
   // Extract unique available years and states
@@ -223,8 +240,22 @@ export default function SubjectDetailClient({
   return (
     <>
       <div className={styles.navigation}>
-        <Link href="/" className={styles.backLink}>
-          ← Kembali ke Senarai Subjek
+        <Link
+          href="/"
+          className={styles.backLink}
+          onClick={() => setIsNavigatingHome(true)}
+        >
+          {isNavigatingHome ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                <path d="M12 2a10 10 0 0 1 10 10" />
+              </svg>
+              Kembali...
+            </span>
+          ) : (
+            '← Kembali ke Senarai Subjek'
+          )}
         </Link>
       </div>
 
@@ -411,11 +442,20 @@ export default function SubjectDetailClient({
                             </a>
                             <a
                               href={getDownloadHref(pack.k1.soalan.publicUrl, pack.k1.soalan.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload}`}
+                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k1.soalan.id ? styles.btnDownloading : ''}`}
+                              onClick={() => handleDownloadPaper(pack.k1.soalan!.id, pack.k1.soalan!.title)}
                               title="Muat Turun Soalan 1 ke Peranti"
+                              aria-label="Muat turun Kertas Soalan 1"
                               download
                             >
-                              📥
+                              {downloadingId === pack.k1.soalan.id ? (
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                              ) : (
+                                '📥'
+                              )}
                             </a>
                           </div>
                         )}
@@ -443,11 +483,20 @@ export default function SubjectDetailClient({
                             </a>
                             <a
                               href={getDownloadHref(pack.k1.skema.publicUrl, pack.k1.skema.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload}`}
+                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k1.skema.id ? styles.btnDownloading : ''}`}
+                              onClick={() => handleDownloadPaper(pack.k1.skema!.id, pack.k1.skema!.title)}
                               title="Muat Turun Skema 1 ke Peranti"
+                              aria-label="Muat turun Skema Jawapan 1"
                               download
                             >
-                              📥
+                              {downloadingId === pack.k1.skema.id ? (
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                              ) : (
+                                '📥'
+                              )}
                             </a>
                           </div>
                         )}
@@ -487,11 +536,20 @@ export default function SubjectDetailClient({
                             </a>
                             <a
                               href={getDownloadHref(pack.k2.soalan.publicUrl, pack.k2.soalan.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload}`}
+                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k2.soalan.id ? styles.btnDownloading : ''}`}
+                              onClick={() => handleDownloadPaper(pack.k2.soalan!.id, pack.k2.soalan!.title)}
                               title="Muat Turun Soalan 2 ke Peranti"
+                              aria-label="Muat turun Kertas Soalan 2"
                               download
                             >
-                              📥
+                              {downloadingId === pack.k2.soalan.id ? (
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                              ) : (
+                                '📥'
+                              )}
                             </a>
                           </div>
                         )}
@@ -519,11 +577,20 @@ export default function SubjectDetailClient({
                             </a>
                             <a
                               href={getDownloadHref(pack.k2.skema.publicUrl, pack.k2.skema.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload}`}
+                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k2.skema.id ? styles.btnDownloading : ''}`}
+                              onClick={() => handleDownloadPaper(pack.k2.skema!.id, pack.k2.skema!.title)}
                               title="Muat Turun Skema 2 ke Peranti"
+                              aria-label="Muat turun Skema Jawapan 2"
                               download
                             >
-                              📥
+                              {downloadingId === pack.k2.skema.id ? (
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                              ) : (
+                                '📥'
+                              )}
                             </a>
                           </div>
                         )}
@@ -563,11 +630,20 @@ export default function SubjectDetailClient({
                             </a>
                             <a
                               href={getDownloadHref(pack.k3.soalan.publicUrl, pack.k3.soalan.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload}`}
+                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k3.soalan.id ? styles.btnDownloading : ''}`}
+                              onClick={() => handleDownloadPaper(pack.k3.soalan!.id, pack.k3.soalan!.title)}
                               title="Muat Turun Soalan 3 ke Peranti"
+                              aria-label="Muat turun Kertas Soalan 3"
                               download
                             >
-                              📥
+                              {downloadingId === pack.k3.soalan.id ? (
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                              ) : (
+                                '📥'
+                              )}
                             </a>
                           </div>
                         )}
@@ -595,11 +671,20 @@ export default function SubjectDetailClient({
                             </a>
                             <a
                               href={getDownloadHref(pack.k3.skema.publicUrl, pack.k3.skema.title)}
-                              className={`${styles.btnAction} ${styles.btnDownload}`}
+                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k3.skema.id ? styles.btnDownloading : ''}`}
+                              onClick={() => handleDownloadPaper(pack.k3.skema!.id, pack.k3.skema!.title)}
                               title="Muat Turun Skema 3 ke Peranti"
+                              aria-label="Muat turun Skema Jawapan 3"
                               download
                             >
-                              📥
+                              {downloadingId === pack.k3.skema.id ? (
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                              ) : (
+                                '📥'
+                              )}
                             </a>
                           </div>
                         )}
@@ -628,11 +713,19 @@ export default function SubjectDetailClient({
                           </a>
                           <a
                             href={getDownloadHref(otherPaper.publicUrl, otherPaper.title)}
-                            className={`${styles.btnAction} ${styles.btnDownload}`}
+                            className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === otherPaper.id ? styles.btnDownloading : ''}`}
+                            onClick={() => handleDownloadPaper(otherPaper.id, otherPaper.title)}
                             title="Muat Turun Fail ke Peranti"
                             download
                           >
-                            📥
+                            {downloadingId === otherPaper.id ? (
+                              <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                <path d="M12 2a10 10 0 0 1 10 10" />
+                              </svg>
+                            ) : (
+                              '📥'
+                            )}
                           </a>
                         </div>
                       </div>
@@ -684,6 +777,36 @@ export default function SubjectDetailClient({
           </div>
         )}
       </section>
+
+      {/* Floating Download Toast */}
+      {downloadToast && (
+        <aside className={styles.downloadToast} role="status" aria-live="polite">
+          <div className={styles.toastSpinner}>
+            {downloadToast.status === 'downloading' ? (
+              <svg className="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.75">
+                <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                <path d="M12 2a10 10 0 0 1 10 10" />
+              </svg>
+            ) : (
+              <span className={styles.toastSuccessIcon}>✓</span>
+            )}
+          </div>
+          <div className={styles.toastText}>
+            <span className={styles.toastHead}>
+              {downloadToast.status === 'downloading' ? 'Memuat turun fail...' : 'Muat turun bermula!'}
+            </span>
+            <span className={styles.toastSub}>{downloadToast.title}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setDownloadToast(null)}
+            className={styles.toastCloseBtn}
+            aria-label="Tutup pemberitahuan"
+          >
+            ✕
+          </button>
+        </aside>
+      )}
     </>
   );
 }

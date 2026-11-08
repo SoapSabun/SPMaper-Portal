@@ -20,6 +20,7 @@ export default function SubjectGrid({ subjects }: { subjects: Subject[] }) {
   return (
     <section className={styles.subjectsSection}>
       <div className={styles.searchBar}>
+        <span className={styles.searchIcon}>🔍</span>
         <input 
           type="text" 
           placeholder="Cari subjek mengikut nama atau kod..." 
@@ -27,6 +28,16 @@ export default function SubjectGrid({ subjects }: { subjects: Subject[] }) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className={styles.clearSearchBtn}
+            aria-label="Padam carian"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       <div className={styles.grid}>

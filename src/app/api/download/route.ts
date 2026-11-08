@@ -15,14 +15,19 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.arrayBuffer();
-    let cleanName = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+    
     // Clean filename for content-disposition
-    cleanName = cleanName.replace(/[/\\?%*:|"<>]/g, '_');
+    let cleanName = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+    cleanName = cleanName.replace(/[/\\?%*:|"<>]/g, '_').trim();
+    
+    // ASCII fallback so mobile browsers don't save raw percent-encoded %20 in the file name
+    const asciiSafeName = cleanName.replace(/[^\x20-\x7E]/g, '_').replace(/"/g, "'");
+    const utf8EncodedName = encodeURIComponent(cleanName);
 
     return new NextResponse(data, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${encodeURIComponent(cleanName)}"; filename*=UTF-8''${encodeURIComponent(cleanName)}`,
+        'Content-Disposition': `attachment; filename="${asciiSafeName}"; filename*=UTF-8''${utf8EncodedName}`,
         'Cache-Control': 'public, max-age=86400, s-maxage=86400',
       },
     });
