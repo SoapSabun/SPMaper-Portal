@@ -304,9 +304,7 @@ export default function SubjectDetailClient({
           <h1>{subject.name}</h1>
           <div className={styles.badgeRow}>
             {subject.code && <span className={styles.codeBadge}>{subject.code}</span>}
-            <span className={styles.paperCountBadge}>
-              {papers.length} {papers.length === 1 ? 'Kertas' : 'Kertas Terkumpul'}
-            </span>
+
           </div>
         </div>
       </header>
