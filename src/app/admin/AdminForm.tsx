@@ -14,6 +14,8 @@ export default function AdminForm({ subjects }: { subjects: Subject[] }) {
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [negeri, setNegeri] = useState('MRSM');
   const [paperType, setPaperType] = useState('Kertas 1');
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
+  const [externalUrl, setExternalUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
   
   const [isUploading, setIsUploading] = useState(false);
@@ -21,8 +23,18 @@ export default function AdminForm({ subjects }: { subjects: Subject[] }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !subjectId || !title || !year) {
-      setMessage({ type: 'error', text: 'Please fill in all fields and select a file.' });
+    if (!subjectId || !title || !year) {
+      setMessage({ type: 'error', text: 'Please fill in all subject and paper details.' });
+      return;
+    }
+
+    if (uploadMode === 'file' && !file) {
+      setMessage({ type: 'error', text: 'Please select a PDF file to upload.' });
+      return;
+    }
+
+    if (uploadMode === 'url' && (!externalUrl || !externalUrl.trim().startsWith('http'))) {
+      setMessage({ type: 'error', text: 'Please enter a valid link (starting with http:// or https://).' });
       return;
     }
 
@@ -30,22 +42,27 @@ export default function AdminForm({ subjects }: { subjects: Subject[] }) {
     setMessage({ type: '', text: '' });
 
     try {
-      // 1. Upload file to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${subjectId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      let finalFilePath = externalUrl.trim();
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('exam-papers')
-        .upload(fileName, file);
+      // 1. Upload file to Supabase Storage if file mode
+      if (uploadMode === 'file' && file) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${subjectId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('exam-papers')
+          .upload(fileName, file);
+
+        if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+        finalFilePath = uploadData.path;
+      }
 
       // 2. Insert record into database
       const { error: dbError } = await supabase.from('papers').insert({
         subject_id: subjectId,
         title,
         year: parseInt(year, 10),
-        file_path: uploadData.path,
+        file_path: finalFilePath,
         negeri,
         paper_type: paperType
       });
@@ -53,11 +70,12 @@ export default function AdminForm({ subjects }: { subjects: Subject[] }) {
       if (dbError) throw new Error(`Database error: ${dbError.message}`);
 
       // Success!
-      setMessage({ type: 'success', text: 'Paper uploaded successfully!' });
+      setMessage({ type: 'success', text: uploadMode === 'url' ? 'Paper link added successfully!' : 'Paper uploaded successfully!' });
       router.refresh();
       
       // Reset form
       setTitle('');
+      setExternalUrl('');
       setFile(null);
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
@@ -78,6 +96,26 @@ export default function AdminForm({ subjects }: { subjects: Subject[] }) {
           {message.text}
         </div>
       )}
+
+      <div className={styles.formGroup}>
+        <label>Add Method</label>
+        <div className={styles.modeToggle}>
+          <button
+            type="button"
+            className={`${styles.modeBtn} ${uploadMode === 'url' ? styles.modeBtnActive : ''}`}
+            onClick={() => setUploadMode('url')}
+          >
+            🔗 External URL / Google Drive
+          </button>
+          <button
+            type="button"
+            className={`${styles.modeBtn} ${uploadMode === 'file' ? styles.modeBtnActive : ''}`}
+            onClick={() => setUploadMode('file')}
+          >
+            📁 Upload PDF File
+          </button>
+        </div>
+      </div>
 
       <div className={styles.formGroup}>
         <label htmlFor="subject">Subject</label>
@@ -168,24 +206,39 @@ export default function AdminForm({ subjects }: { subjects: Subject[] }) {
         </select>
       </div>
 
-      <div className={styles.formGroup}>
-        <label htmlFor="file-upload">PDF File</label>
-        <input 
-          id="file-upload"
-          type="file" 
-          accept="application/pdf"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className={styles.fileInput}
-          required 
-        />
-      </div>
+      {uploadMode === 'url' ? (
+        <div className={styles.formGroup}>
+          <label htmlFor="externalUrl">Paper Link (Google Drive, Online PDF URL)</label>
+          <input 
+            id="externalUrl"
+            type="url"
+            value={externalUrl}
+            onChange={(e) => setExternalUrl(e.target.value)}
+            className={styles.input}
+            placeholder="https://drive.google.com/file/d/... or https://.../paper.pdf"
+            required={uploadMode === 'url'}
+          />
+        </div>
+      ) : (
+        <div className={styles.formGroup}>
+          <label htmlFor="file-upload">PDF File</label>
+          <input 
+            id="file-upload"
+            type="file" 
+            accept="application/pdf"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            className={styles.fileInput}
+            required={uploadMode === 'file'}
+          />
+        </div>
+      )}
 
       <button 
         type="submit" 
         className={styles.submitBtn} 
         disabled={isUploading}
       >
-        {isUploading ? 'Uploading...' : 'Upload Paper'}
+        {isUploading ? 'Saving...' : (uploadMode === 'url' ? 'Add Paper Link' : 'Upload Paper')}
       </button>
     </form>
   );

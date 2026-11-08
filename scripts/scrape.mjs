@@ -113,19 +113,12 @@ async function runScraper() {
         }
       }
 
-      console.log(`Found ${pdfLinks.length} PDF links in total!`);
+      console.log(`Found ${pdfLinks.length} PDF links in total! Adding to catalogue via direct URL...`);
 
-      // 3. Download and Upload each PDF
+      // 3. Save direct PDF URLs into database (Instant - No Storage Uploads)
       for (const link of pdfLinks) {
-        console.log(`\nProcessing: ${link.name}`);
-
         try {
-          // A. Download the PDF file into memory
-          console.log(`Downloading from ${link.url}...`);
-          const pdfResponse = await axios.get(link.url, { responseType: 'arraybuffer' });
-          const pdfBuffer = Buffer.from(pdfResponse.data);
-
-          // Basic parsing logic (you can improve this based on filenames!)
+          // Basic parsing logic based on filename and folder
           let negeri = link.negeri || 'Unknown';
 
           let lowerName = link.name.toLowerCase();
@@ -149,35 +142,36 @@ async function runScraper() {
             cleanTitle = cleanTitle.slice(0, -4).trim();
           }
 
-          // B. Upload to Supabase Storage
-          const fileName = `${SUBJECT_ID}/${Date.now()}-${Math.random().toString(36).substring(7)}.pdf`;
-          console.log(`Uploading to Supabase Storage as ${fileName}...`);
+          // Check if already in database
+          const { data: existing } = await supabase
+            .from('papers')
+            .select('id')
+            .eq('subject_id', SUBJECT_ID)
+            .eq('title', cleanTitle)
+            .eq('year', YEAR)
+            .limit(1);
 
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('exam-papers')
-            .upload(fileName, pdfBuffer, {
-              contentType: 'application/pdf',
-            });
+          if (existing && existing.length > 0) {
+            console.log(`⏭️  Already exists, skipping: ${cleanTitle}`);
+            continue;
+          }
 
-          if (uploadError) throw uploadError;
-
-          // C. Insert into Database
-          console.log(`Inserting record into 'papers' table...`);
+          // Insert direct link into Database
           const { error: dbError } = await supabase.from('papers').insert({
             subject_id: SUBJECT_ID,
             title: cleanTitle,
             year: YEAR,
-            file_path: uploadData.path,
+            file_path: link.url,
             negeri: negeri,
             paper_type: paperType
           });
 
           if (dbError) throw dbError;
 
-          console.log(`✅ Successfully added: ${link.name}`);
+          console.log(`✅ Added: ${cleanTitle} (${negeri} - ${paperType})`);
 
         } catch (err) {
-          console.error(`❌ Failed to process ${link.name}:`, err.message);
+          console.error(`❌ Failed to add ${link.name}:`, err.message);
         }
       }
 

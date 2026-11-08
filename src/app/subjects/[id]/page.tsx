@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getPapersBySubject } from '@/lib/api';
+import { getPapersBySubject, getPublicUrlForPaper } from '@/lib/api';
 import { supabase } from '@/lib/supabase/client';
 import SubjectDetailClient from './SubjectDetailClient';
 
@@ -23,7 +23,7 @@ export default async function SubjectPage({ params }: { params: Promise<{ id: st
   
   const papersWithUrl = papers.map(paper => ({
     ...paper,
-    publicUrl: supabase.storage.from('exam-papers').getPublicUrl(paper.file_path).data.publicUrl
+    publicUrl: getPublicUrlForPaper(paper.file_path)
   }));
 
   return (

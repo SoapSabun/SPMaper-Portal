@@ -50,6 +50,9 @@ export async function getPapersBySubject(subjectId: string) {
 }
 
 export function getPublicUrlForPaper(filePath: string) {
+  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+    return filePath;
+  }
   const { data } = supabase
     .storage
     .from('exam-papers')

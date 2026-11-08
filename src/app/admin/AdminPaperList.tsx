@@ -1,6 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/browser';
+import { getPublicUrlForPaper } from '@/lib/api';
 import { useState } from 'react';
 import styles from './admin.module.css';
 import { useRouter } from 'next/navigation';
@@ -31,12 +32,12 @@ export default function AdminPaperList({ papers }: { papers: AdminPaper[] }) {
     setIsDeleting(id);
     const supabase = createClient();
     
-    // 1. Delete from storage
-    const { error: storageError } = await supabase.storage.from('exam-papers').remove([filePath]);
-    if (storageError) {
-      alert(`Error deleting file: ${storageError.message}`);
-      setIsDeleting(null);
-      return;
+    // 1. Delete from storage only if it's an internal file
+    if (!filePath.startsWith('http://') && !filePath.startsWith('https://')) {
+      const { error: storageError } = await supabase.storage.from('exam-papers').remove([filePath]);
+      if (storageError) {
+        console.warn(`Storage delete notice: ${storageError.message}`);
+      }
     }
 
     // 2. Delete from DB
@@ -73,7 +74,21 @@ export default function AdminPaperList({ papers }: { papers: AdminPaper[] }) {
           <tbody>
             {paginatedPapers.map((paper) => (
               <tr key={paper.id}>
-                <td>{paper.title}</td>
+                <td>
+                  <a 
+                    href={getPublicUrlForPaper(paper.file_path)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'underline', color: 'var(--brand-primary)', fontWeight: 600 }}
+                  >
+                    {paper.title}
+                  </a>
+                  {paper.file_path.startsWith('http') && (
+                    <span className={styles.linkBadge}>
+                      {paper.file_path.includes('drive.google.com') ? 'Google Drive' : 'External Link'}
+                    </span>
+                  )}
+                </td>
                 <td>{Array.isArray(paper.subjects) ? paper.subjects[0]?.name : paper.subjects?.name || 'Unknown'}</td>
                 <td>{paper.year}</td>
                 <td>{paper.negeri || '-'}</td>

@@ -141,3 +141,9 @@ button {
   opacity: 1;
   color: var(--brand-heading);
 }
+
+@media (max-width: 768px) {
+  .signatureMark {
+    display: none;
+  }
+}

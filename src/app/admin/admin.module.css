@@ -63,6 +63,42 @@
   color: var(--text-primary);
 }
 
+.modeToggle {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-primary);
+  padding: 0.3rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.modeBtn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.modeBtnActive {
+  background: var(--brand-primary);
+  color: var(--bg-primary);
+}
+
+.linkBadge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--brand-blush);
+  color: var(--brand-primary);
+  margin-left: 0.5rem;
+}
+
 .input {
   width: 100%;
   padding: 0.875rem 1rem;
