@@ -465,17 +465,24 @@
   flex-shrink: 0;
 }
 
-.btnSoalan,
-.btnSkema,
-.btnGeneric {
+.btnGroup {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(11, 74, 74, 0.08);
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.btnAction {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
   font-weight: 700;
   font-size: 0.8rem;
-  padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.75rem;
   transition: all 0.15s;
   text-decoration: none;
   white-space: nowrap;
@@ -486,35 +493,44 @@
 .btnSoalan {
   background: var(--brand-primary);
   color: var(--bg-primary);
-  border: 1px solid var(--brand-primary);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btnSoalan:hover {
   background: var(--brand-primary-hover);
-  border-color: var(--brand-primary-hover);
-  transform: translateY(-1px);
 }
 
 .btnSkema {
   background: var(--bg-secondary);
   color: var(--brand-primary);
-  border: 1.5px solid var(--brand-gold);
+  border-right: 1px solid var(--border-color);
 }
 
 .btnSkema:hover {
-  background: var(--brand-gold);
-  color: white;
-  transform: translateY(-1px);
+  background: var(--brand-blush);
 }
 
 .btnGeneric {
   background: var(--bg-tertiary);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
 }
 
 .btnGeneric:hover {
   background: var(--border-color);
+}
+
+.btnDownload {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 0.4rem 0.65rem;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+
+.btnDownload:hover {
+  background: var(--brand-gold);
+  color: white;
 }
 
 /* ============================================================ */
@@ -735,16 +751,31 @@
   .slotActions {
     width: 100%;
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .btnGroup {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .btnAction {
+    min-height: 42px; /* Touch-friendly tap target */
   }
 
   .btnSoalan,
   .btnSkema,
   .btnGeneric {
     flex: 1;
-    min-height: 42px; /* Touch-friendly tap target */
-    font-size: 0.8rem;
-    padding: 0.5rem;
+    font-size: 0.825rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .btnDownload {
+    min-width: 48px;
+    font-size: 1.05rem;
   }
 
   .pagination {
