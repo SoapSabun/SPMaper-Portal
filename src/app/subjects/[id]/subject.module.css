@@ -1,5 +1,9 @@
+/* ============================================================ */
+/* Navigation & Header                                          */
+/* ============================================================ */
 .navigation {
-  margin-bottom: 2rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .backLink {
@@ -10,6 +14,7 @@
   font-weight: 600;
   font-size: 0.95rem;
   transition: opacity 0.2s, transform 0.2s;
+  padding: 0.25rem 0;
 }
 
 .backLink:hover {
@@ -20,13 +25,13 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   margin-bottom: 2rem;
 }
 
 .subjectIconLarge {
-  width: 72px;
-  height: 72px;
+  width: 68px;
+  height: 68px;
   flex-shrink: 0;
   border-radius: var(--radius-lg);
   background: var(--brand-primary);
@@ -34,7 +39,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.25rem;
+  font-size: 2.15rem;
   font-weight: 800;
   box-shadow: var(--shadow-sm);
   border: 2px solid var(--brand-gold-light);
@@ -45,6 +50,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.4rem;
+  min-width: 0;
 }
 
 .titleWrapper h1 {
@@ -52,6 +58,8 @@
   font-weight: 800;
   color: var(--brand-heading);
   line-height: 1.15;
+  letter-spacing: -0.02em;
+  word-break: break-word;
 }
 
 .badgeRow {
@@ -63,11 +71,11 @@
 
 .codeBadge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
+  padding: 0.2rem 0.65rem;
   border-radius: 999px;
   background: var(--brand-blush);
   color: var(--brand-primary);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   border: 1px solid rgba(11, 74, 74, 0.2);
@@ -75,11 +83,11 @@
 
 .paperCountBadge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
+  padding: 0.2rem 0.65rem;
   border-radius: 999px;
   background: var(--bg-tertiary);
   color: var(--text-secondary);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   border: 1px solid var(--border-color);
 }
@@ -102,11 +110,13 @@
 .searchRow {
   display: flex;
   gap: 0.75rem;
+  align-items: center;
 }
 
 .searchInputWrapper {
   position: relative;
   flex: 1;
+  min-width: 0;
 }
 
 .searchIcon {
@@ -121,7 +131,7 @@
 
 .searchInput {
   width: 100%;
-  padding: 0.75rem 2.25rem 0.75rem 2.5rem;
+  padding: 0.75rem 2.25rem 0.75rem 2.4rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   background: var(--bg-primary);
@@ -143,14 +153,14 @@
   transform: translateY(-50%);
   color: var(--text-tertiary);
   font-size: 0.8rem;
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
 }
 
 .stateSelect {
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 1.15rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   background: var(--bg-primary);
@@ -159,7 +169,8 @@
   font-weight: 600;
   outline: none;
   cursor: pointer;
-  min-width: 180px;
+  min-width: 170px;
+  flex-shrink: 0;
 }
 
 .stateSelect:focus {
@@ -169,9 +180,9 @@
 .yearRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
+  padding: 0.2rem 0.2rem 0.4rem;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -190,7 +201,7 @@
 }
 
 .yearBtn {
-  padding: 0.4rem 1rem;
+  padding: 0.4rem 0.95rem;
   border-radius: 999px;
   border: 1px solid var(--brand-primary);
   color: var(--brand-primary);
@@ -200,6 +211,7 @@
   flex-shrink: 0;
   transition: all 0.2s;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .yearBtn:hover {
@@ -238,6 +250,7 @@
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .typeBtnActive {
@@ -263,6 +276,7 @@
   cursor: pointer;
   background: none;
   padding: 0;
+  white-space: nowrap;
 }
 
 /* ============================================================ */
@@ -270,8 +284,9 @@
 /* ============================================================ */
 .packsGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  width: 100%;
 }
 
 .packCard {
@@ -284,6 +299,7 @@
   gap: 1rem;
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  min-width: 0;
 }
 
 .packCard:hover {
@@ -298,12 +314,14 @@
   justify-content: space-between;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-color);
+  gap: 0.75rem;
 }
 
 .packHeaderLeft {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .stateIcon {
@@ -327,6 +345,9 @@
   font-weight: 800;
   color: var(--brand-heading);
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .packMeta {
@@ -353,19 +374,20 @@
 .packBody {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.65rem;
 }
 
 .slotBox {
   background: rgba(245, 234, 215, 0.45);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 0.9rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
   transition: background 0.15s;
+  min-width: 0;
 }
 
 .slotBox:hover {
@@ -377,42 +399,52 @@
   flex-direction: column;
   gap: 0.15rem;
   min-width: 0;
+  flex: 1;
 }
 
 .slotTitle {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
+  word-break: break-word;
 }
 
 .slotSubtitle {
   font-size: 0.75rem;
   color: var(--text-tertiary);
+  line-height: 1.2;
 }
 
 .slotActions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   flex-shrink: 0;
 }
 
-.btnSoalan {
+.btnSoalan,
+.btnSkema,
+.btnGeneric {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
-  background: var(--brand-primary);
-  color: var(--bg-primary);
   font-weight: 700;
   font-size: 0.8rem;
   padding: 0.45rem 0.85rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--brand-primary);
   transition: all 0.15s;
   text-decoration: none;
+  white-space: nowrap;
+  min-height: 36px;
+  touch-action: manipulation;
+}
+
+.btnSoalan {
+  background: var(--brand-primary);
+  color: var(--bg-primary);
+  border: 1px solid var(--brand-primary);
 }
 
 .btnSoalan:hover {
@@ -422,18 +454,9 @@
 }
 
 .btnSkema {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
   background: var(--bg-secondary);
   color: var(--brand-primary);
-  font-weight: 700;
-  font-size: 0.8rem;
-  padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-sm);
   border: 1.5px solid var(--brand-gold);
-  transition: all 0.15s;
-  text-decoration: none;
 }
 
 .btnSkema:hover {
@@ -443,18 +466,9 @@
 }
 
 .btnGeneric {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
   background: var(--bg-tertiary);
   color: var(--text-primary);
-  font-weight: 600;
-  font-size: 0.8rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
-  transition: all 0.15s;
-  text-decoration: none;
 }
 
 .btnGeneric:hover {
@@ -465,7 +479,7 @@
 /* Empty State & Pagination                                     */
 /* ============================================================ */
 .emptyState {
-  padding: 4rem 2rem;
+  padding: 3.5rem 1.5rem;
   text-align: center;
   color: var(--text-secondary);
   background: var(--bg-secondary);
@@ -474,11 +488,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .emptyIcon {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   opacity: 0.7;
 }
 
@@ -498,22 +512,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  margin-top: 3rem;
-  padding-top: 2rem;
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+  padding-top: 1.75rem;
   border-top: 1px solid var(--border-color);
+  width: 100%;
 }
 
 .pageBtn {
-  padding: 0.5rem 1.25rem;
+  padding: 0.55rem 1.25rem;
   border-radius: var(--radius-md);
   background: var(--bg-secondary);
   color: var(--brand-primary);
   border: 1px solid var(--brand-primary);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pageBtn:hover:not(:disabled) {
@@ -531,40 +550,104 @@
 .pageInfo {
   font-weight: 600;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 /* ============================================================ */
-/* Responsive Tweaks (Tablet, Mobile)                           */
+/* Tablet & iPad Specific Optimization (768px - 1024px)         */
 /* ============================================================ */
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .packsGrid {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 1rem;
   }
 
+  .slotBox {
+    padding: 0.85rem 1rem;
+  }
+}
+
+/* ============================================================ */
+/* Mobile Screen Optimization (< 768px)                         */
+/* ============================================================ */
+@media (max-width: 768px) {
+  .navigation {
+    margin-top: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .header {
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .subjectIconLarge {
+    width: 50px;
+    height: 50px;
+    font-size: 1.6rem;
+    border-radius: var(--radius-md);
+  }
+
   .titleWrapper h1 {
-    font-size: 1.75rem;
+    font-size: 1.55rem;
+  }
+
+  .badgeRow {
+    gap: 0.35rem;
+  }
+
+  .codeBadge,
+  .paperCountBadge {
+    font-size: 0.72rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .filterBar {
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
   }
 
   .searchRow {
     flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .searchInputWrapper {
+    width: 100%;
+  }
+
+  .searchInput {
+    font-size: 0.9rem;
+    padding: 0.65rem 2rem 0.65rem 2.2rem;
   }
 
   .stateSelect {
     width: 100%;
+    min-width: 100%;
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+  }
+
+  .yearRow {
+    padding-bottom: 0.35rem;
+    gap: 0.45rem;
+  }
+
+  .filterLabel {
+    font-size: 0.75rem;
+  }
+
+  .yearBtn {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.8rem;
   }
 
   .subFilterRow {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 0.75rem;
   }
 
   .typeToggle {
@@ -574,22 +657,87 @@
   .typeBtn {
     flex: 1;
     text-align: center;
+    padding: 0.45rem 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .filterSummary {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 0.78rem;
+  }
+
+  .packCard {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    gap: 0.85rem;
+  }
+
+  .packTitle {
+    font-size: 0.98rem;
+  }
+
+  .stateIcon {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
   }
 
   .slotBox {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.75rem;
   }
 
   .slotActions {
     width: 100%;
-    justify-content: flex-end;
+    display: flex;
+    gap: 0.5rem;
   }
 
-  .btnSoalan, .btnSkema {
+  .btnSoalan,
+  .btnSkema,
+  .btnGeneric {
     flex: 1;
-    justify-content: center;
-    padding: 0.6rem 0.75rem; /* Touch-friendly tap target */
+    min-height: 42px; /* Touch-friendly tap target */
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+
+  .pagination {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    gap: 0.75rem;
+  }
+
+  .pageBtn {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+    min-height: 38px;
+  }
+
+  .pageInfo {
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================================ */
+/* Very Small Phones (< 380px, e.g. iPhone SE)                  */
+/* ============================================================ */
+@media (max-width: 380px) {
+  .titleWrapper h1 {
+    font-size: 1.35rem;
+  }
+
+  .subjectIconLarge {
+    width: 44px;
+    height: 44px;
+    font-size: 1.4rem;
+  }
+
+  .yearTag {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.45rem;
   }
 }

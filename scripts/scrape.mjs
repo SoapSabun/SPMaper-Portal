@@ -19,26 +19,223 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ==========================================
-// CONFIGURATION: Customize this for your scrape
+// CONFIGURATION: AddMaths / Matematik Tambahan
+// Subject ID: 5385f218-f767-43ef-92de-da63d50708ec
 // ==========================================
-// List of tasks to scrape. Add URLs and the corresponding Subject UUIDs here.
-const TASKS = [
-  // Example for Matematik 2019:
-  // { url: 'https://trial.spmpaper.me/?dir=2019%2FMatematik', subjectId: '8764b396-8441-407f-9933-e31c5f6ff7a4', year: 2019 },
+const ADDMATHS_ID = '5385f218-f767-43ef-92de-da63d50708ec';
 
-  // Add your new subjects here!
-  // Subject IDs from your database:
-  // Matematik Tambahan: '5385f218-f767-43ef-92de-da63d50708ec'
-  // Fizik: 'd34b2e6e-f962-44b9-bd96-062017bd2761'
-  // Sejarah: 'f20c754c-48f3-4d13-a0ec-31a95f27154a'
-  // Kimia: '4aa74c62-25a9-4b89-8a68-f335f627691d'
-  // Bahasa Melayu: 'e098c425-1e34-4395-8b98-0946b9eb83d5'
-  // English: '839aaa63-3def-4757-b468-d4158b3e86f9'
-  // Pendidikan Agama Islam: '6cddab4b-c8f0-4c2b-9766-d1ba882bc1c9'
-  // Elektrik Elektronik: '7747be36-7291-408d-b6eb-9ad2610e6780'
-  // Mekanikal: 'b17f4ef9-301f-4a82-869f-365dda5a54f1'
-  // Lukisan Kejuruteraan: 'e44e8d50-2ddc-41de-aef7-96e5f67beecf'
+export const TASKS = [
+  { url: 'https://trial.spmpaper.me/?dir=2025%2FMatematik%20Tambahan%20(Add%20Maths)', subjectId: ADDMATHS_ID, year: 2025 },
+  { url: 'https://trial.spmpaper.me/?dir=2024%2FMatematik%20Tambahan%20(Add%20Maths)', subjectId: ADDMATHS_ID, year: 2024 },
+  { url: 'https://trial.spmpaper.me/?dir=2023%2FMatematik%20Tambahan%20(Add%20Maths)', subjectId: ADDMATHS_ID, year: 2023 },
+  { url: 'https://trial.spmpaper.me/?dir=2022%2FMatematik%20Tambahan%20(Add%20Maths)', subjectId: ADDMATHS_ID, year: 2022 },
+  { url: 'https://trial.spmpaper.me/?dir=2021%2FMatematik%20Tambahan%20(Add%20Math)', subjectId: ADDMATHS_ID, year: 2021 },
+  { url: 'https://trial.spmpaper.me/?dir=2020%2FMatematik%20Tambahan%20(Addmath)', subjectId: ADDMATHS_ID, year: 2020 },
+  { url: 'https://trial.spmpaper.me/?dir=2019%2FAddMath', subjectId: ADDMATHS_ID, year: 2019 },
+  { url: 'https://trial.spmpaper.me/?dir=2018%2FAddMath', subjectId: ADDMATHS_ID, year: 2018 },
 ];
+
+function detectNegeri(folderPath, filename) {
+  const combined = `${folderPath} ${filename}`.toLowerCase();
+
+  // National / Special bodies
+  if (combined.includes('sbp')) return 'SBP';
+  if (combined.includes('mrsm')) return 'MRSM';
+
+  // Specific Malaysian States
+  if (combined.includes('johor') || combined.includes('batu pahat') || combined.includes('johor bahru') || combined.includes('kulai') || combined.includes('muar') || combined.includes('kluang')) return 'Johor';
+  if (combined.includes('kedah') || combined.includes('langkawi') || combined.includes('kubang pasu')) return 'Kedah';
+  if (combined.includes('kelantan') || combined.includes('yik') || combined.includes('kota bharu')) return 'Kelantan';
+  if (combined.includes('melaka') || combined.includes('malacca')) return 'Melaka';
+  if (combined.includes('negeri sembilan') || combined.includes(' n9') || combined.includes('_n9') || combined.includes('-n9') || combined.includes('/n9')) return 'Negeri Sembilan';
+  if (combined.includes('pahang') || combined.includes('kuantan')) return 'Pahang';
+  if (combined.includes('perak') || combined.includes('ipoh') || combined.includes('taiping')) return 'Perak';
+  if (combined.includes('perlis') || combined.includes('kangar')) return 'Perlis';
+  if (combined.includes('pulau pinang') || combined.includes('penang')) return 'Pulau Pinang';
+  if (combined.includes('sabah')) return 'Sabah';
+  if (combined.includes('sarawak')) return 'Sarawak';
+  if (combined.includes('selangor')) return 'Selangor';
+  if (combined.includes('terengganu') || combined.includes('trg')) return 'Terengganu';
+  if (combined.includes('kuala lumpur') || combined.includes('wp kl') || combined.includes('wpkl')) return 'W.P. Kuala Lumpur';
+  if (combined.includes('putrajaya')) return 'W.P. Putrajaya';
+  if (combined.includes('labuan')) return 'W.P. Labuan';
+
+  return 'Percubaan';
+}
+
+function detectPaperType(filename) {
+  const lower = filename.toLowerCase();
+
+  const isSkema = 
+    lower.includes('skema') || 
+    lower.includes('jawapan') || 
+    lower.includes('answer') || 
+    lower.includes('scheme') || 
+    lower.includes('marking') ||
+    lower.includes('ms ') ||
+    lower.includes('ms_') ||
+    lower.includes('-ms');
+
+  const isK1 = lower.includes('k1') || lower.includes('kertas 1') || lower.includes('p1') || lower.includes('paper 1');
+  const isK2 = lower.includes('k2') || lower.includes('kertas 2') || lower.includes('p2') || lower.includes('paper 2');
+  const isK3 = lower.includes('k3') || lower.includes('kertas 3') || lower.includes('p3') || lower.includes('paper 3');
+
+  if (isSkema) {
+    if (isK1 && !isK2) return 'Skema Kertas 1';
+    if (isK2 && !isK1) return 'Skema Kertas 2';
+    if (isK3) return 'Skema Kertas 3';
+    return 'Skema';
+  } else {
+    if (isK1 && !isK2) return 'Kertas 1';
+    if (isK2 && !isK1) return 'Kertas 2';
+    if (isK3) return 'Kertas 3';
+    return 'Kertas 1';
+  }
+}
+
+function cleanTitle(rawName) {
+  let name = decodeURIComponent(rawName);
+  if (name.toLowerCase().endsWith('.pdf')) {
+    name = name.slice(0, -4).trim();
+  }
+  return name.replace(/\s+/g, ' ').trim();
+}
+
+function scoreTitle(paper) {
+  let score = 0;
+  const title = paper.title || '';
+  if (/^\d{4}\b/.test(title)) score += 30;
+  const upperCount = (title.match(/[A-Z]/g) || []).length;
+  const lowerCount = (title.match(/[a-z]/g) || []).length;
+  if (lowerCount > upperCount) score += 20;
+  if (title.startsWith('SKEMA-') || title.startsWith('SKEMA_')) score -= 5;
+  if (title.includes('Trial K1') || title.includes('Trial K2')) score -= 5;
+  if (paper.negeri && paper.negeri !== 'Percubaan') score += 10;
+  if (title.includes('SBP') && paper.negeri === 'SBP') score += 15;
+  if (title.includes('MRSM') && paper.negeri === 'MRSM') score += 15;
+  score -= Math.min(title.length / 10, 5);
+  return score;
+}
+
+/**
+ * Deduplicate papers in memory using HTTP HEAD content-length
+ */
+async function deduplicateBatch(papers) {
+  if (papers.length <= 1) return papers;
+  console.log(`  🔍 Checking ${papers.length} links for duplicate uploads via file sizes...`);
+  
+  const CONCURRENCY = 15;
+  const paperDetails = [];
+
+  for (let i = 0; i < papers.length; i += CONCURRENCY) {
+    const batch = papers.slice(i, i + CONCURRENCY);
+    const promises = batch.map(async (p) => {
+      try {
+        const res = await axios.head(p.file_path, { timeout: 10000 });
+        const size = res.headers['content-length'];
+        return { ...p, size: size ? parseInt(size, 10) : null };
+      } catch (err) {
+        return { ...p, size: null };
+      }
+    });
+    const results = await Promise.all(promises);
+    paperDetails.push(...results);
+  }
+
+  const bySize = new Map();
+  const byTitle = new Map();
+
+  for (const p of paperDetails) {
+    if (p.size) {
+      if (!bySize.has(p.size)) bySize.set(p.size, []);
+      bySize.get(p.size).push(p);
+    }
+    const tKey = p.title.toLowerCase().trim();
+    if (!byTitle.has(tKey)) byTitle.set(tKey, []);
+    byTitle.get(tKey).push(p);
+  }
+
+  const discardedIds = new Set();
+
+  for (const group of bySize.values()) {
+    if (group.length > 1) {
+      group.sort((a, b) => scoreTitle(b) - scoreTitle(a));
+      for (const dup of group.slice(1)) {
+        discardedIds.add(dup.file_path);
+      }
+    }
+  }
+
+  for (const group of byTitle.values()) {
+    if (group.length > 1) {
+      group.sort((a, b) => scoreTitle(b) - scoreTitle(a));
+      for (const dup of group.slice(1)) {
+        discardedIds.add(dup.file_path);
+      }
+    }
+  }
+
+  const clean = papers.filter(p => !discardedIds.has(p.file_path));
+  console.log(`  ✨ Filtered out ${papers.length - clean.length} redundant duplicate uploads. Kept ${clean.length} unique papers.`);
+  return clean;
+}
+
+/**
+ * Recursively crawl directories on trial.spmpaper.me starting from rootDir
+ */
+async function crawlFolder(startDir) {
+  const visited = new Set();
+  const queue = [startDir];
+  const pdfLinks = [];
+
+  while (queue.length > 0) {
+    const currentDir = queue.shift();
+    if (visited.has(currentDir)) continue;
+    visited.add(currentDir);
+
+    const url = `https://trial.spmpaper.me/?dir=${encodeURIComponent(currentDir)}`;
+    try {
+      const res = await axios.get(url, { timeout: 15000 });
+      const $ = cheerio.load(res.data);
+
+      $('a').each((_, el) => {
+        const href = $(el).attr('href');
+        const text = $(el).text().trim();
+        if (!href) return;
+
+        // Check for subdirectories to enqueue
+        if (href.includes('?dir=')) {
+          try {
+            const u = new URL(href, 'https://trial.spmpaper.me');
+            const d = u.searchParams.get('dir');
+            if (d && d.startsWith(startDir) && !visited.has(d) && !queue.includes(d)) {
+              if (!u.searchParams.has('order')) {
+                queue.push(d);
+              }
+            }
+          } catch (e) {}
+        }
+
+        // Check for PDF files
+        if (href.toLowerCase().includes('.pdf')) {
+          let fullPdfUrl = href;
+          if (!fullPdfUrl.startsWith('http')) {
+            fullPdfUrl = `https://trial.spmpaper.me${fullPdfUrl.startsWith('/') ? '' : '/'}${fullPdfUrl}`;
+          }
+          pdfLinks.push({
+            name: text || href.split('/').pop(),
+            url: fullPdfUrl,
+            folder: currentDir
+          });
+        }
+      });
+    } catch (err) {
+      console.error(`  ⚠️ Error fetching directory "${currentDir}":`, err.message);
+    }
+  }
+
+  return pdfLinks;
+}
 
 async function runScraper() {
   if (TASKS.length === 0) {
@@ -46,144 +243,93 @@ async function runScraper() {
     return;
   }
 
+  // Pre-fetch all existing paper URLs for this subject to prevent duplicates fast
+  console.log(`Checking existing papers in database for subject ${ADDMATHS_ID}...`);
+  const { data: existingRows, error: fetchErr } = await supabase
+    .from('papers')
+    .select('file_path')
+    .eq('subject_id', ADDMATHS_ID);
+
+  if (fetchErr) {
+    console.error('Error fetching existing papers:', fetchErr.message);
+  }
+
+  const existingUrlSet = new Set((existingRows || []).map(r => r.file_path));
+  console.log(`Found ${existingUrlSet.size} already existing papers in database.`);
+
+  let grandTotalAdded = 0;
+
   for (const task of TASKS) {
     const { url: TARGET_URL, subjectId: SUBJECT_ID, year: YEAR } = task;
     console.log(`\n==========================================`);
-    console.log(`Starting scrape of: ${TARGET_URL}`);
+    console.log(`Starting scrape of Year ${YEAR}: ${TARGET_URL}`);
 
     try {
-      // 1. Fetch the main subject HTML (which contains folders like Johor, Kedah, etc.)
-      const response = await axios.get(TARGET_URL);
-      const $ = cheerio.load(response.data);
+      const u = new URL(TARGET_URL);
+      const startDir = u.searchParams.get('dir');
+      if (!startDir) {
+        console.warn(`No '?dir=' param found in ${TARGET_URL}, skipping.`);
+        continue;
+      }
 
-      // Find all state folders
-      const stateLinks = [];
-      const dirQuery = decodeURIComponent(TARGET_URL.split('?dir=')[1] || '');
+      console.log(`Crawling folder tree recursively for "${startDir}"...`);
+      const pdfs = await crawlFolder(startDir);
+      console.log(`Found ${pdfs.length} PDF links in Year ${YEAR}! Preparing papers...`);
 
-      $('a').each((i, element) => {
-        let href = $(element).attr('href');
-        if (href && href.includes('?dir=') && !href.includes('&order=')) {
-          const decodedHref = decodeURIComponent(href);
-          if (decodedHref.includes(dirQuery) && decodedHref.length > `?dir=${dirQuery}`.length) {
-            const fullUrl = href.startsWith('http') ? href : `https://trial.spmpaper.me${href.startsWith('/') ? '' : '/'}${href}`;
-            if (!stateLinks.includes(fullUrl)) stateLinks.push(fullUrl);
-          }
+      const papersToInsert = [];
+
+      for (const item of pdfs) {
+        if (existingUrlSet.has(item.url)) {
+          continue;
         }
-      });
 
-      console.log(`Found ${stateLinks.length} state folders! Crawling them to find PDFs...`);
+        const title = cleanTitle(item.name);
+        const negeri = detectNegeri(item.folder, title);
+        const paperType = detectPaperType(title);
 
-      const pdfLinks = [];
+        papersToInsert.push({
+          subject_id: SUBJECT_ID,
+          title: title,
+          year: YEAR,
+          file_path: item.url,
+          negeri: negeri,
+          paper_type: paperType
+        });
 
-      // 2. Crawl each state folder to find actual .pdf files
-      for (const stateUrl of stateLinks) {
-        try {
-          const stateRes = await axios.get(stateUrl);
-          const state$ = cheerio.load(stateRes.data);
+        // Mark as seen in our local set to avoid duplicate entries within same scrape
+        existingUrlSet.add(item.url);
+      }
 
-          let folderNegeri = 'Unknown';
-          try {
-            const urlObj = new URL(stateUrl);
-            const dirParam = urlObj.searchParams.get('dir');
-            if (dirParam) {
-              const parts = dirParam.split('/');
-              let rawNegeri = parts[parts.length - 1];
-              if (rawNegeri) {
-                if (rawNegeri.toUpperCase() === 'N9') folderNegeri = 'Negeri Sembilan';
-                else if (rawNegeri.toUpperCase() === 'SBP') folderNegeri = 'SBP';
-                else if (rawNegeri.toUpperCase() === 'MRSM') folderNegeri = 'MRSM';
-                else folderNegeri = rawNegeri.charAt(0).toUpperCase() + rawNegeri.slice(1).toLowerCase();
-              }
-            }
-          } catch (_err) { }
+      // In-memory deduplication by checking content length and titles
+      const cleanPapersToInsert = await deduplicateBatch(papersToInsert);
 
-          state$('a').each((i, element) => {
-            let href = state$(element).attr('href');
-            const text = state$(element).text().trim();
-            if (href && href.toLowerCase().includes('.pdf')) {
-              // Ensure absolute URL
-              if (!href.startsWith('http')) {
-                href = `https://trial.spmpaper.me${href.startsWith('/') ? '' : '/'}${href}`;
-              }
-              pdfLinks.push({ url: href, name: text || `Paper_${i}`, negeri: folderNegeri });
-            }
-          });
-        } catch (e) {
-          console.error(`Failed to crawl folder ${stateUrl}:`, e.message);
+      console.log(`Inserting ${cleanPapersToInsert.length} clean papers for Year ${YEAR}...`);
+
+      // Insert in batches of 50 to optimize Supabase network requests
+      const BATCH_SIZE = 50;
+      let insertedCount = 0;
+
+      for (let i = 0; i < cleanPapersToInsert.length; i += BATCH_SIZE) {
+        const batch = cleanPapersToInsert.slice(i, i + BATCH_SIZE);
+        const { error: insertErr } = await supabase.from('papers').insert(batch);
+        if (insertErr) {
+          console.error(`  ❌ Failed inserting batch ${i / BATCH_SIZE + 1}:`, insertErr.message);
+        } else {
+          insertedCount += batch.length;
+          console.log(`  ✅ Inserted batch: ${insertedCount}/${cleanPapersToInsert.length} papers`);
         }
       }
 
-      console.log(`Found ${pdfLinks.length} PDF links in total! Adding to catalogue via direct URL...`);
-
-      // 3. Save direct PDF URLs into database (Instant - No Storage Uploads)
-      for (const link of pdfLinks) {
-        try {
-          // Basic parsing logic based on filename and folder
-          let negeri = link.negeri || 'Unknown';
-
-          let lowerName = link.name.toLowerCase();
-          let paperType = 'Kertas 1';
-
-          let isKertas1 = lowerName.includes('k1') || lowerName.includes('kertas 1') || lowerName.includes('p1') || lowerName.includes('paper 1');
-          let isKertas2 = lowerName.includes('k2') || lowerName.includes('kertas 2') || lowerName.includes('p2') || lowerName.includes('paper 2');
-          let isKertas3 = lowerName.includes('k3') || lowerName.includes('kertas 3') || lowerName.includes('p3') || lowerName.includes('paper 3');
-
-          if (isKertas3) paperType = 'Kertas 3';
-          else if (isKertas2) paperType = 'Kertas 2';
-          else if (isKertas1) paperType = 'Kertas 1';
-
-          let isSkema = lowerName.includes('jawapan') || lowerName.includes('skema') || lowerName.includes('answer') || lowerName.includes('scheme') || lowerName.includes('skm');
-          if (isSkema) {
-            paperType = 'Skema ' + paperType;
-          }
-
-          let cleanTitle = link.name;
-          if (cleanTitle.toLowerCase().endsWith('.pdf')) {
-            cleanTitle = cleanTitle.slice(0, -4).trim();
-          }
-
-          // Check if already in database
-          const { data: existing } = await supabase
-            .from('papers')
-            .select('id')
-            .eq('subject_id', SUBJECT_ID)
-            .eq('title', cleanTitle)
-            .eq('year', YEAR)
-            .limit(1);
-
-          if (existing && existing.length > 0) {
-            console.log(`⏭️  Already exists, skipping: ${cleanTitle}`);
-            continue;
-          }
-
-          // Insert direct link into Database
-          const { error: dbError } = await supabase.from('papers').insert({
-            subject_id: SUBJECT_ID,
-            title: cleanTitle,
-            year: YEAR,
-            file_path: link.url,
-            negeri: negeri,
-            paper_type: paperType
-          });
-
-          if (dbError) throw dbError;
-
-          console.log(`✅ Added: ${cleanTitle} (${negeri} - ${paperType})`);
-
-        } catch (err) {
-          console.error(`❌ Failed to add ${link.name}:`, err.message);
-        }
-      }
-
-      console.log(`\n🎉 Scraping completed for: ${TARGET_URL}`);
+      grandTotalAdded += insertedCount;
+      console.log(`🎉 Finished Year ${YEAR}. Added ${insertedCount} papers.`);
 
     } catch (err) {
-      console.error(`Error fetching target URL ${TARGET_URL}:`, err.message);
+      console.error(`Error processing task ${TARGET_URL}:`, err.message);
     }
   }
 
-  console.log('\n🚀 All scraping tasks completed!');
+  console.log(`\n🚀 All tasks completed! Total new papers added to database: ${grandTotalAdded}`);
 }
 
-// Run the script
+// Run the scraper
 runScraper();

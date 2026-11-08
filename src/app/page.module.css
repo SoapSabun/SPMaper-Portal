@@ -1,5 +1,5 @@
 .header {
-  padding: 4rem 0 3rem;
+  padding: 3.5rem 0 2.5rem;
   text-align: center;
 }
 
@@ -7,51 +7,55 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .logo {
   border-radius: 50%;
   border: 3px solid var(--brand-gold-light);
   box-shadow: var(--shadow-md);
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .header h1 {
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 800;
   color: var(--brand-heading);
   margin-bottom: 0;
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .header p {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   color: var(--text-secondary);
-  max-width: 600px;
+  max-width: 550px;
   margin: 0 auto;
+  line-height: 1.5;
 }
 
 .subjectsSection {
-  padding-bottom: 6rem;
+  padding-bottom: 5rem;
 }
 
 .searchBar {
-  max-width: 600px;
-  margin: 0 auto 3rem;
+  max-width: 550px;
+  margin: 0 auto 2.5rem;
+  width: 100%;
 }
 
 .input {
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 0.9rem 1.35rem;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-color);
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   box-shadow: var(--shadow-sm);
   transition: box-shadow 0.2s, border-color 0.2s;
   outline: none;
@@ -64,62 +68,49 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .logoTitleWrapper {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .logo {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .header h1 {
-    font-size: 3rem;
-  }
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  width: 100%;
 }
 
 .cardLink {
   display: block;
   text-decoration: none;
   cursor: pointer;
+  min-width: 0;
 }
 
 .subjectCard {
-  padding: 1.5rem;
+  padding: 1.25rem;
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.15rem;
+  min-width: 0;
 }
 
 .subjectIcon {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
   border-radius: var(--radius-md);
   background: var(--brand-primary);
   color: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
+  font-size: 1.6rem;
   font-weight: 800;
   box-shadow: var(--shadow-sm);
   border: 2px solid var(--brand-gold-light);
 }
 
 .subjectCard h2 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   margin-bottom: 0.25rem;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .codeBadge {
@@ -137,9 +128,96 @@
 .emptyState {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 4rem;
+  padding: 3rem 1.5rem;
   background: var(--bg-secondary);
   border-radius: var(--radius-lg);
   color: var(--text-tertiary);
   border: 1px dashed var(--border-color);
+}
+
+/* Tablet & iPad (768px - 1024px) */
+@media (max-width: 1024px) {
+  .header {
+    padding: 3rem 0 2rem;
+  }
+
+  .header h1 {
+    font-size: 3rem;
+  }
+
+  .grid {
+    gap: 1rem;
+  }
+}
+
+/* Mobile & Small Tablets (< 768px) */
+@media (max-width: 768px) {
+  .header {
+    padding: 2.25rem 0 1.5rem;
+  }
+
+  .logoTitleWrapper {
+    gap: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .logo {
+    width: 68px;
+    height: 68px;
+    border-width: 2.5px;
+  }
+
+  .header h1 {
+    font-size: 2.35rem;
+  }
+
+  .header p {
+    font-size: 0.95rem;
+    padding: 0 0.5rem;
+  }
+
+  .searchBar {
+    margin: 0 auto 1.5rem;
+  }
+
+  .input {
+    font-size: 0.95rem;
+    padding: 0.75rem 1.15rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .subjectCard {
+    padding: 1rem;
+    gap: 0.85rem;
+  }
+
+  .subjectIcon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.35rem;
+  }
+
+  .subjectCard h2 {
+    font-size: 1.05rem;
+  }
+
+  .subjectsSection {
+    padding-bottom: 3.5rem;
+  }
+}
+
+/* Very Small Mobile (< 380px) */
+@media (max-width: 380px) {
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .logo {
+    width: 56px;
+    height: 56px;
+  }
 }
