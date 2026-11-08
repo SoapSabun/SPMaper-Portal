@@ -73,11 +73,46 @@
   width: 100%;
 }
 
-.cardLink {
-  display: block;
-  text-decoration: none;
-  cursor: pointer;
+.cardLoading {
+  border-color: var(--brand-gold) !important;
+  box-shadow: 0 0 0 2px rgba(184, 135, 44, 0.25), var(--shadow-md) !important;
+  transform: translateY(-2px);
+}
+
+.subjectIconLoading {
+  background: var(--brand-gold) !important;
+  color: white !important;
+  border-color: var(--brand-gold) !important;
+}
+
+.subjectTextWrapper {
   min-width: 0;
+  flex: 1;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.loadingTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--brand-gold);
+  letter-spacing: 0.02em;
+}
+
+.loadingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-gold);
+  animation: pulseOpacity 1s ease-in-out infinite;
 }
 
 .subjectCard {

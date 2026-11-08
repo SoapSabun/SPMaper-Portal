@@ -7,6 +7,7 @@ import styles from './page.module.css';
 
 export default function SubjectGrid({ subjects }: { subjects: Subject[] }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [loadingSubjectId, setLoadingSubjectId] = useState<string | null>(null);
 
   const filteredSubjects = subjects.filter((subject) => {
     const query = searchQuery.toLowerCase();
@@ -21,7 +22,7 @@ export default function SubjectGrid({ subjects }: { subjects: Subject[] }) {
       <div className={styles.searchBar}>
         <input 
           type="text" 
-          placeholder="Search for a subject by name or code..." 
+          placeholder="Cari subjek mengikut nama atau kod..." 
           className={styles.input}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -29,25 +30,47 @@ export default function SubjectGrid({ subjects }: { subjects: Subject[] }) {
       </div>
 
       <div className={styles.grid}>
-        {filteredSubjects.map((subject) => (
-          <Link key={subject.id} href={`/subjects/${subject.id}`} className={`card ${styles.cardLink}`}>
-            <div className={styles.subjectCard}>
-              <div className={styles.subjectIcon}>
-                {subject.name.charAt(0).toUpperCase()}
+        {filteredSubjects.map((subject) => {
+          const isLoading = loadingSubjectId === subject.id;
+          return (
+            <Link 
+              key={subject.id} 
+              href={`/subjects/${subject.id}`} 
+              className={`card ${styles.cardLink} ${isLoading ? styles.cardLoading : ''}`}
+              onClick={() => setLoadingSubjectId(subject.id)}
+            >
+              <div className={styles.subjectCard}>
+                <div className={`${styles.subjectIcon} ${isLoading ? styles.subjectIconLoading : ''}`}>
+                  {isLoading ? (
+                    <svg className="spinner" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.75">
+                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                      <path d="M12 2a10 10 0 0 1 10 10" />
+                    </svg>
+                  ) : (
+                    subject.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div className={styles.subjectTextWrapper}>
+                  <h2>{subject.name}</h2>
+                  <div className={styles.metaRow}>
+                    {subject.code && <span className={styles.codeBadge}>{subject.code}</span>}
+                    {isLoading && (
+                      <span className={styles.loadingTag}>
+                        <span className={styles.loadingDot} /> Memuatkan...
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div>
-                <h2>{subject.name}</h2>
-                {subject.code && <span className={styles.codeBadge}>{subject.code}</span>}
-              </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
         
         {filteredSubjects.length === 0 && (
           <div className={styles.emptyState}>
             {subjects.length === 0 
-              ? "No subjects found. Add some in the admin panel." 
-              : "No subjects match your search."}
+              ? "Tiada subjek dijumpai. Tambah di panel admin." 
+              : "Tiada subjek yang sepadan dengan carian anda."}
           </div>
         )}
       </div>

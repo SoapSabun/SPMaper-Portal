@@ -145,7 +145,7 @@ button {
   letter-spacing: 0.05em;
   color: var(--text-tertiary);
   opacity: 0.6;
-  transition: opacity 0.2s, color 0.2s;
+  transition: opacity 0.2s, color 0.2s, transform 0.2s;
   z-index: 50;
   user-select: none;
 }
@@ -153,10 +153,75 @@ button {
 .signatureMark:hover {
   opacity: 1;
   color: var(--brand-heading);
+  transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
   .signatureMark {
-    display: none;
+    display: inline-flex;
+    align-items: center;
+    bottom: 0.75rem;
+    right: 0.85rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    opacity: 0.75;
+    background: rgba(255, 249, 240, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid rgba(217, 205, 188, 0.6);
+    box-shadow: 0 2px 5px rgba(11, 74, 74, 0.08);
+    color: var(--brand-primary);
   }
+}
+
+/* Loading animations & skeleton system */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 0.75s linear infinite;
+  display: inline-block;
+  transform-origin: center;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(234, 224, 205, 0.45) 25%,
+    rgba(255, 249, 240, 0.8) 37%,
+    rgba(234, 224, 205, 0.45) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes pulseOpacity {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.pulse {
+  animation: pulseOpacity 1.5s ease-in-out infinite;
 }

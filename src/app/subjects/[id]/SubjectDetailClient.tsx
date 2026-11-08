@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Subject, PaperWithUrl } from '@/lib/api';
 import styles from './subject.module.css';
@@ -61,12 +61,21 @@ export default function SubjectDetailClient({
   subject: Subject;
   papers: PaperWithUrl[];
 }) {
+  const [isPending, startTransition] = useTransition();
+  const [openingId, setOpeningId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('All');
   const [selectedNegeri, setSelectedNegeri] = useState<string>('All');
   const [typeFilter, setTypeFilter] = useState<'all' | 'soalan' | 'skema'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // 8 exam packs per page (~20-30 individual papers)
+
+  const handleOpenPaper = (id: string) => {
+    setOpeningId(id);
+    setTimeout(() => {
+      setOpeningId(null);
+    }, 2000);
+  };
 
   // Extract unique available years and states
   const uniqueYears = Array.from(new Set(papers.map((p) => p.year?.toString() || '')))
@@ -162,28 +171,43 @@ export default function SubjectDetailClient({
   const totalPages = Math.ceil(examPacks.length / itemsPerPage);
   const paginatedPacks = examPacks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  // Handlers that reset pagination
+  // Handlers that reset pagination with smooth transition
   const handleYearChange = (year: string) => {
-    setSelectedYear(year);
-    setCurrentPage(1);
+    startTransition(() => {
+      setSelectedYear(year);
+      setCurrentPage(1);
+    });
   };
 
   const handleNegeriChange = (negeri: string) => {
-    setSelectedNegeri(negeri);
-    setCurrentPage(1);
+    startTransition(() => {
+      setSelectedNegeri(negeri);
+      setCurrentPage(1);
+    });
   };
 
   const handleTypeChange = (type: 'all' | 'soalan' | 'skema') => {
-    setTypeFilter(type);
-    setCurrentPage(1);
+    startTransition(() => {
+      setTypeFilter(type);
+      setCurrentPage(1);
+    });
   };
 
   const handleResetFilters = () => {
-    setSearchQuery('');
-    setSelectedYear('All');
-    setSelectedNegeri('All');
-    setTypeFilter('all');
-    setCurrentPage(1);
+    startTransition(() => {
+      setSearchQuery('');
+      setSelectedYear('All');
+      setSelectedNegeri('All');
+      setTypeFilter('all');
+      setCurrentPage(1);
+    });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    startTransition(() => {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   };
 
   const hasActiveFilters =
@@ -219,6 +243,13 @@ export default function SubjectDetailClient({
       {/* Streamlined Filter Bar                                 */}
       {/* ====================================================== */}
       <section className={styles.filterBar}>
+        {/* Progress indicator when filtering */}
+        {isPending && (
+          <div className={styles.filterProgress}>
+            <div className={styles.filterProgressBar} />
+          </div>
+        )}
+
         {/* Search input + State dropdown */}
         <div className={styles.searchRow}>
           <div className={styles.searchInputWrapper}>
@@ -228,8 +259,11 @@ export default function SubjectDetailClient({
               placeholder="Cari negeri, sekolah, kertas (cth: SBP, MRSM, Kertas 2)..."
               value={searchQuery}
               onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
+                const val = e.target.value;
+                startTransition(() => {
+                  setSearchQuery(val);
+                  setCurrentPage(1);
+                });
               }}
               className={styles.searchInput}
             />
@@ -237,8 +271,10 @@ export default function SubjectDetailClient({
               <button
                 type="button"
                 onClick={() => {
-                  setSearchQuery('');
-                  setCurrentPage(1);
+                  startTransition(() => {
+                    setSearchQuery('');
+                    setCurrentPage(1);
+                  });
                 }}
                 className={styles.clearSearchBtn}
               >
@@ -320,7 +356,7 @@ export default function SubjectDetailClient({
       {/* ====================================================== */}
       <section>
         {paginatedPacks.length > 0 ? (
-          <div className={styles.packsGrid}>
+          <div className={`${styles.packsGrid} ${isPending ? styles.packsGridPending : ''}`}>
             {paginatedPacks.map((pack) => (
               <article key={pack.key} className={styles.packCard}>
                 {/* Pack Card Header */}
@@ -352,10 +388,21 @@ export default function SubjectDetailClient({
                             href={pack.k1.soalan.publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={styles.btnSoalan}
+                            className={`${styles.btnSoalan} ${openingId === pack.k1.soalan.id ? styles.btnLoading : ''}`}
+                            onClick={() => handleOpenPaper(pack.k1.soalan!.id)}
                             title="Buka Kertas Soalan 1"
                           >
-                            👁️ Soalan
+                            {openingId === pack.k1.soalan.id ? (
+                              <>
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                                Membuka...
+                              </>
+                            ) : (
+                              <>👁️ Soalan</>
+                            )}
                           </a>
                         )}
                         {pack.k1.skema && (
@@ -363,10 +410,21 @@ export default function SubjectDetailClient({
                             href={pack.k1.skema.publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={styles.btnSkema}
+                            className={`${styles.btnSkema} ${openingId === pack.k1.skema.id ? styles.btnLoading : ''}`}
+                            onClick={() => handleOpenPaper(pack.k1.skema!.id)}
                             title="Buka Skema Jawapan 1"
                           >
-                            📋 Skema
+                            {openingId === pack.k1.skema.id ? (
+                              <>
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                                Membuka...
+                              </>
+                            ) : (
+                              <>📋 Skema</>
+                            )}
                           </a>
                         )}
                       </div>
@@ -386,10 +444,21 @@ export default function SubjectDetailClient({
                             href={pack.k2.soalan.publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={styles.btnSoalan}
+                            className={`${styles.btnSoalan} ${openingId === pack.k2.soalan.id ? styles.btnLoading : ''}`}
+                            onClick={() => handleOpenPaper(pack.k2.soalan!.id)}
                             title="Buka Kertas Soalan 2"
                           >
-                            👁️ Soalan
+                            {openingId === pack.k2.soalan.id ? (
+                              <>
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                                Membuka...
+                              </>
+                            ) : (
+                              <>👁️ Soalan</>
+                            )}
                           </a>
                         )}
                         {pack.k2.skema && (
@@ -397,10 +466,21 @@ export default function SubjectDetailClient({
                             href={pack.k2.skema.publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={styles.btnSkema}
+                            className={`${styles.btnSkema} ${openingId === pack.k2.skema.id ? styles.btnLoading : ''}`}
+                            onClick={() => handleOpenPaper(pack.k2.skema!.id)}
                             title="Buka Skema Jawapan 2"
                           >
-                            📋 Skema
+                            {openingId === pack.k2.skema.id ? (
+                              <>
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                                Membuka...
+                              </>
+                            ) : (
+                              <>📋 Skema</>
+                            )}
                           </a>
                         )}
                       </div>
@@ -420,10 +500,21 @@ export default function SubjectDetailClient({
                             href={pack.k3.soalan.publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={styles.btnSoalan}
+                            className={`${styles.btnSoalan} ${openingId === pack.k3.soalan.id ? styles.btnLoading : ''}`}
+                            onClick={() => handleOpenPaper(pack.k3.soalan!.id)}
                             title="Buka Kertas Soalan 3"
                           >
-                            👁️ Soalan
+                            {openingId === pack.k3.soalan.id ? (
+                              <>
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                                Membuka...
+                              </>
+                            ) : (
+                              <>👁️ Soalan</>
+                            )}
                           </a>
                         )}
                         {pack.k3.skema && (
@@ -431,10 +522,21 @@ export default function SubjectDetailClient({
                             href={pack.k3.skema.publicUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={styles.btnSkema}
+                            className={`${styles.btnSkema} ${openingId === pack.k3.skema.id ? styles.btnLoading : ''}`}
+                            onClick={() => handleOpenPaper(pack.k3.skema!.id)}
                             title="Buka Skema Jawapan 3"
                           >
-                            📋 Skema
+                            {openingId === pack.k3.skema.id ? (
+                              <>
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                                Membuka...
+                              </>
+                            ) : (
+                              <>📋 Skema</>
+                            )}
                           </a>
                         )}
                       </div>
@@ -453,9 +555,20 @@ export default function SubjectDetailClient({
                           href={otherPaper.publicUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={styles.btnSoalan}
+                          className={`${styles.btnSoalan} ${openingId === otherPaper.id ? styles.btnLoading : ''}`}
+                          onClick={() => handleOpenPaper(otherPaper.id)}
                         >
-                          👁️ View
+                          {openingId === otherPaper.id ? (
+                            <>
+                              <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                <path d="M12 2a10 10 0 0 1 10 10" />
+                              </svg>
+                              Membuka...
+                            </>
+                          ) : (
+                            <>👁️ View</>
+                          )}
                         </a>
                         <a
                           href={getDownloadUrl(otherPaper.publicUrl)}
@@ -495,7 +608,7 @@ export default function SubjectDetailClient({
             <button
               type="button"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
+              onClick={() => handlePageChange(currentPage - 1)}
               className={styles.pageBtn}
             >
               ← Sebelum
@@ -506,7 +619,7 @@ export default function SubjectDetailClient({
             <button
               type="button"
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
+              onClick={() => handlePageChange(currentPage + 1)}
               className={styles.pageBtn}
             >
               Seterusnya →
