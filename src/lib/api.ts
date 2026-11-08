@@ -22,6 +22,8 @@ export type PaperWithUrl = Paper & {
   publicUrl: string;
 }
 
+const HIDDEN_SUBJECT_CODES = ['EE', 'MEKI', 'LK'];
+
 export async function getSubjects() {
   const { data, error } = await supabase
     .from('subjects')
@@ -32,7 +34,9 @@ export async function getSubjects() {
     console.error('Error fetching subjects:', error);
     return [];
   }
-  return data as Subject[];
+  return (data as Subject[]).filter(
+    (s) => !HIDDEN_SUBJECT_CODES.includes(s.code?.toUpperCase())
+  );
 }
 
 export async function getPapersBySubject(subjectId: string) {
