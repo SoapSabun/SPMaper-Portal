@@ -23,7 +23,7 @@ export default async function AdminPage() {
 
   const { data: papers } = await supabase
     .from('papers')
-    .select('id, title, year, file_path, subjects(name)')
+    .select('id, title, year, file_path, negeri, paper_type, subjects(name)')
     .order('created_at', { ascending: false });
 
   return (

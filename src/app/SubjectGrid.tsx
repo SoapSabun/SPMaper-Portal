@@ -30,7 +30,7 @@ export default function SubjectGrid({ subjects }: { subjects: Subject[] }) {
 
       <div className={styles.grid}>
         {filteredSubjects.map((subject) => (
-          <Link key={subject.id} href={`/subjects/${subject.id}`} className="card">
+          <Link key={subject.id} href={`/subjects/${subject.id}`} className={`card ${styles.cardLink}`}>
             <div className={styles.subjectCard}>
               <div className={styles.subjectIcon}>
                 {subject.name.charAt(0).toUpperCase()}

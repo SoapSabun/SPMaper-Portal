@@ -5,7 +5,21 @@ import { useState } from 'react';
 import styles from './admin.module.css';
 import { useRouter } from 'next/navigation';
 
-export default function AdminPaperList({ papers }: { papers: any[] }) {
+export type AdminPaper = {
+  id: string;
+  title: string;
+  year: number;
+  file_path: string;
+  negeri?: string;
+  paper_type?: string;
+  subjects: {
+    name: string;
+  } | {
+    name: string;
+  }[] | null;
+};
+
+export default function AdminPaperList({ papers }: { papers: AdminPaper[] }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,10 +71,10 @@ export default function AdminPaperList({ papers }: { papers: any[] }) {
             </tr>
           </thead>
           <tbody>
-            {paginatedPapers.map((paper: any) => (
+            {paginatedPapers.map((paper) => (
               <tr key={paper.id}>
                 <td>{paper.title}</td>
-                <td>{paper.subjects?.name || 'Unknown'}</td>
+                <td>{Array.isArray(paper.subjects) ? paper.subjects[0]?.name : paper.subjects?.name || 'Unknown'}</td>
                 <td>{paper.year}</td>
                 <td>{paper.negeri || '-'}</td>
                 <td>{paper.paper_type || '-'}</td>

@@ -62,9 +62,10 @@ export default function AdminForm({ subjects }: { subjects: Subject[] }) {
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      setMessage({ type: 'error', text: error.message || 'Something went wrong.' });
+      const errorMessage = error instanceof Error ? error.message : 'Something went wrong.';
+      setMessage({ type: 'error', text: errorMessage });
     } finally {
       setIsUploading(false);
     }

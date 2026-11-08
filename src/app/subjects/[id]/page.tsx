@@ -1,7 +1,5 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPapersBySubject } from '@/lib/api';
-import styles from './subject.module.css';
 import { supabase } from '@/lib/supabase/client';
 import SubjectDetailClient from './SubjectDetailClient';
 

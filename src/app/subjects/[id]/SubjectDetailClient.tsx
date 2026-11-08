@@ -1,24 +1,25 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import { Subject, PaperWithUrl } from '@/lib/api';
 import styles from './subject.module.css';
 
-export default function SubjectDetailClient({ subject, papers }: { subject: any, papers: any[] }) {
+export default function SubjectDetailClient({ subject, papers }: { subject: Subject; papers: PaperWithUrl[] }) {
   const [selectedYear, setSelectedYear] = useState<string>('All');
   const [selectedNegeri, setSelectedNegeri] = useState<string>('All');
   const [selectedType, setSelectedType] = useState<string>('All');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   
-  // Extract unique values
-  const years = ['All', ...Array.from(new Set(papers.map(p => p.year?.toString() || ''))).filter(Boolean)].sort((a, b) => {
-    if (a === 'All') return -1;
-    if (b === 'All') return 1;
-    return parseInt(b) - parseInt(a);
-  });
+  // Extract unique values with safe sorting
+  const uniqueYears = Array.from(new Set(papers.map(p => p.year?.toString() || ''))).filter(Boolean).sort((a, b) => parseInt(b) - parseInt(a));
+  const years = ['All', ...uniqueYears];
   
-  const negeris = ['All', ...Array.from(new Set(papers.map(p => p.negeri || ''))).filter(Boolean)].sort();
-  const types = ['All', ...Array.from(new Set(papers.map(p => p.paper_type || ''))).filter(Boolean)].sort();
+  const uniqueNegeris = Array.from(new Set(papers.map(p => p.negeri || ''))).filter(Boolean).sort();
+  const negeris = ['All', ...uniqueNegeris];
+
+  const uniqueTypes = Array.from(new Set(papers.map(p => p.paper_type || ''))).filter(Boolean).sort();
+  const types = ['All', ...uniqueTypes];
   
   const filteredPapers = papers.filter(p => {
     const matchYear = selectedYear === 'All' || p.year?.toString() === selectedYear;
@@ -27,10 +28,20 @@ export default function SubjectDetailClient({ subject, papers }: { subject: any,
     return matchYear && matchNegeri && matchType;
   });
 
-  // Reset pagination when filters change
-  useEffect(() => {
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
     setCurrentPage(1);
-  }, [selectedYear, selectedNegeri, selectedType]);
+  };
+
+  const handleNegeriChange = (negeri: string) => {
+    setSelectedNegeri(negeri);
+    setCurrentPage(1);
+  };
+
+  const handleTypeChange = (type: string) => {
+    setSelectedType(type);
+    setCurrentPage(1);
+  };
 
   const totalPages = Math.ceil(filteredPapers.length / itemsPerPage);
   const paginatedPapers = filteredPapers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -60,7 +71,7 @@ export default function SubjectDetailClient({ subject, papers }: { subject: any,
             {years.map(year => (
               <button
                 key={year}
-                onClick={() => setSelectedYear(year)}
+                onClick={() => handleYearChange(year)}
                 className={`${styles.yearTab} ${selectedYear === year ? styles.yearTabActive : ''}`}
               >
                 {year}
@@ -76,7 +87,7 @@ export default function SubjectDetailClient({ subject, papers }: { subject: any,
               {negeris.map(neg => (
                 <button
                   key={neg}
-                  onClick={() => setSelectedNegeri(neg)}
+                  onClick={() => handleNegeriChange(neg)}
                   className={`${styles.yearTab} ${selectedNegeri === neg ? styles.yearTabActive : ''}`}
                 >
                   {neg}
@@ -93,7 +104,7 @@ export default function SubjectDetailClient({ subject, papers }: { subject: any,
               {types.map(type => (
                 <button
                   key={type}
-                  onClick={() => setSelectedType(type)}
+                  onClick={() => handleTypeChange(type)}
                   className={`${styles.yearTab} ${selectedType === type ? styles.yearTabActive : ''}`}
                 >
                   {type}

@@ -14,6 +14,12 @@ export type Paper = {
   year: number;
   file_path: string;
   created_at: string;
+  negeri?: string;
+  paper_type?: string;
+}
+
+export type PaperWithUrl = Paper & {
+  publicUrl: string;
 }
 
 export async function getSubjects() {

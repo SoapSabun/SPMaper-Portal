@@ -88,6 +88,12 @@
   }
 }
 
+.cardLink {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .subjectCard {
   padding: 1.5rem;
   display: flex;
@@ -125,7 +131,7 @@
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  border: 1px solid rgba(107, 28, 42, 0.2);
+  border: 1px solid rgba(11, 74, 74, 0.2);
 }
 
 .emptyState {
