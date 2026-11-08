@@ -54,6 +54,7 @@ interface ExamPack {
   k1: { soalan?: PaperWithUrl; skema?: PaperWithUrl };
   k2: { soalan?: PaperWithUrl; skema?: PaperWithUrl };
   k3: { soalan?: PaperWithUrl; skema?: PaperWithUrl };
+  k4: { soalan?: PaperWithUrl; skema?: PaperWithUrl };
   others: PaperWithUrl[];
   totalCount: number;
 }
@@ -152,6 +153,7 @@ export default function SubjectDetailClient({
         k1: {},
         k2: {},
         k3: {},
+        k4: {},
         others: [],
         totalCount: 0,
       });
@@ -181,7 +183,8 @@ export default function SubjectDetailClient({
 
     const isK1 = lowerType.includes('kertas 1') || lowerType.includes('k1') || lowerTitle.includes('k1') || lowerTitle.includes('kertas 1');
     const isK2 = lowerType.includes('kertas 2') || lowerType.includes('k2') || lowerTitle.includes('k2') || lowerTitle.includes('kertas 2');
-    const isK3 = lowerType.includes('kertas 3') || lowerType.includes('k3') || lowerTitle.includes('k3') || lowerTitle.includes('kertas 3');
+    const isK3 = lowerType.includes('kertas 3') || lowerType.includes('k3') || lowerTitle.includes('k3') || lowerTitle.includes('kertas 3') || lowerTitle.includes('bertutur') || lowerTitle.includes('speaking');
+    const isK4 = lowerType.includes('kertas 4') || lowerType.includes('k4') || lowerTitle.includes('k4') || lowerTitle.includes('kertas 4') || lowerTitle.includes('mendengar') || lowerTitle.includes('listening');
 
     if (isBoth) {
       if (isK1) {
@@ -193,6 +196,9 @@ export default function SubjectDetailClient({
       } else if (isK3) {
         if (!pack.k3.soalan) pack.k3.soalan = paper;
         if (!pack.k3.skema) pack.k3.skema = paper;
+      } else if (isK4) {
+        if (!pack.k4.soalan) pack.k4.soalan = paper;
+        if (!pack.k4.skema) pack.k4.skema = paper;
       } else {
         pack.others.push(paper);
       }
@@ -205,6 +211,9 @@ export default function SubjectDetailClient({
     } else if (isK3) {
       if (isSkema) pack.k3.skema = paper;
       else pack.k3.soalan = paper;
+    } else if (isK4) {
+      if (isSkema) pack.k4.skema = paper;
+      else pack.k4.soalan = paper;
     } else {
       pack.others.push(paper);
     }
@@ -659,7 +668,7 @@ export default function SubjectDetailClient({
                     <div className={styles.slotBox}>
                       <div className={styles.slotInfo}>
                         <span className={styles.slotTitle}>Kertas 3</span>
-                        <span className={styles.slotSubtitle}>Amali / Lisan</span>
+                        <span className={styles.slotSubtitle}>Ujian Bertutur / Lisan / Amali</span>
                       </div>
                       <div className={styles.slotActions}>
                         {pack.k3.soalan && pack.k3.skema && pack.k3.soalan.id === pack.k3.skema.id ? (
@@ -746,6 +755,114 @@ export default function SubjectDetailClient({
                                   download
                                 >
                                   {downloadingId === pack.k3.skema.id ? (
+                                    <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                      <path d="M12 2a10 10 0 0 1 10 10" />
+                                    </svg>
+                                  ) : (
+                                    '📥'
+                                  )}
+                                </a>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Kertas 4 Slot (Ujian Mendengar / Listening) */}
+                  {(pack.k4.soalan || pack.k4.skema) && (
+                    <div className={styles.slotBox}>
+                      <div className={styles.slotInfo}>
+                        <span className={styles.slotTitle}>Kertas 4</span>
+                        <span className={styles.slotSubtitle}>Ujian Mendengar / Listening</span>
+                      </div>
+                      <div className={styles.slotActions}>
+                        {pack.k4.soalan && pack.k4.skema && pack.k4.soalan.id === pack.k4.skema.id ? (
+                          <div className={styles.btnGroup}>
+                            <a
+                              href={pack.k4.soalan.publicUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`${styles.btnAction} ${styles.btnBoth} ${openingId === pack.k4.soalan.id ? styles.btnLoading : ''}`}
+                              onClick={() => handleOpenPaper(pack.k4.soalan!.id)}
+                              title="Buka & Baca Kertas Soalan & Skema (Lengkap)"
+                            >
+                              {openingId === pack.k4.soalan.id ? 'Membuka...' : '📑 Soalan & Skema'}
+                            </a>
+                            <a
+                              href={getDownloadHref(pack.k4.soalan.publicUrl, pack.k4.soalan.title)}
+                              className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k4.soalan.id ? styles.btnDownloading : ''}`}
+                              onClick={() => handleDownloadPaper(pack.k4.soalan!.id, pack.k4.soalan!.title)}
+                              title="Muat Turun Soalan & Skema ke Peranti"
+                              aria-label="Muat turun Kertas Soalan & Skema 4"
+                              download
+                            >
+                              {downloadingId === pack.k4.soalan.id ? (
+                                <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                  <path d="M12 2a10 10 0 0 1 10 10" />
+                                </svg>
+                              ) : (
+                                '📥'
+                              )}
+                            </a>
+                          </div>
+                        ) : (
+                          <>
+                            {pack.k4.soalan && (
+                              <div className={styles.btnGroup}>
+                                <a
+                                  href={pack.k4.soalan.publicUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${styles.btnAction} ${styles.btnSoalan} ${openingId === pack.k4.soalan.id ? styles.btnLoading : ''}`}
+                                  onClick={() => handleOpenPaper(pack.k4.soalan!.id)}
+                                  title="Buka & Baca Kertas Soalan 4"
+                                >
+                                  {openingId === pack.k4.soalan.id ? 'Membuka...' : '👁️ Soalan'}
+                                </a>
+                                <a
+                                  href={getDownloadHref(pack.k4.soalan.publicUrl, pack.k4.soalan.title)}
+                                  className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k4.soalan.id ? styles.btnDownloading : ''}`}
+                                  onClick={() => handleDownloadPaper(pack.k4.soalan!.id, pack.k4.soalan!.title)}
+                                  title="Muat Turun Soalan 4 ke Peranti"
+                                  aria-label="Muat turun Kertas Soalan 4"
+                                  download
+                                >
+                                  {downloadingId === pack.k4.soalan.id ? (
+                                    <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                      <path d="M12 2a10 10 0 0 1 10 10" />
+                                    </svg>
+                                  ) : (
+                                    '📥'
+                                  )}
+                                </a>
+                              </div>
+                            )}
+                            {pack.k4.skema && (
+                              <div className={styles.btnGroup}>
+                                <a
+                                  href={pack.k4.skema.publicUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`${styles.btnAction} ${styles.btnSkema} ${openingId === pack.k4.skema.id ? styles.btnLoading : ''}`}
+                                  onClick={() => handleOpenPaper(pack.k4.skema!.id)}
+                                  title={!pack.k4.soalan ? "Skema Jawapan (Soalan tidak dimuat naik oleh penyedia)" : "Buka & Baca Skema Jawapan 4"}
+                                >
+                                  {openingId === pack.k4.skema.id ? 'Membuka...' : !pack.k4.soalan ? '📋 Skema (Sahaja)' : '📋 Skema'}
+                                </a>
+                                <a
+                                  href={getDownloadHref(pack.k4.skema.publicUrl, pack.k4.skema.title)}
+                                  className={`${styles.btnAction} ${styles.btnDownload} ${downloadingId === pack.k4.skema.id ? styles.btnDownloading : ''}`}
+                                  onClick={() => handleDownloadPaper(pack.k4.skema!.id, pack.k4.skema!.title)}
+                                  title="Muat Turun Skema 4 ke Peranti"
+                                  aria-label="Muat turun Skema Jawapan 4"
+                                  download
+                                >
+                                  {downloadingId === pack.k4.skema.id ? (
                                     <svg className="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                                       <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
                                       <path d="M12 2a10 10 0 0 1 10 10" />
